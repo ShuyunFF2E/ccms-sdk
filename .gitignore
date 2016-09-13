@@ -1,2 +1,6 @@
-.sass-cache/
-*.css.map
+# Created by .ignore support plugin (hsz.mobi)
+node_modules
+build
+coverage
+lib
+.idea/
