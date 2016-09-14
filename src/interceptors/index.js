@@ -6,11 +6,18 @@
 
 import angular from 'angular';
 
-import tokenRefreshInterceptor, { setAuthFailedBehavior, setRefreshTokenUrl } from './token-refresh-interceptor';
+import tokenRefreshInterceptor, {
+	REQUEST_TOKEN_STORAGE_KEY,
+	setAuthFailedBehavior,
+	setRefreshTokenUrl
+} from './token-refresh-interceptor';
 
 export default angular
 	.module('ccms.utils.interceptors', [])
 	.constant('ccmsTokenRefreshInterceptor', tokenRefreshInterceptor)
-	.constant('$ccmsSetAuthFailedBehavior', setAuthFailedBehavior)
-	.constant('$ccmsSetRefreshTokenUrl', setRefreshTokenUrl)
+	.constant('$ccmsRefreshToken', {
+		setAuthFailedBehavior,
+		setRefreshTokenUrl,
+		REQUEST_TOKEN_STORAGE_KEY
+	})
 	.name;

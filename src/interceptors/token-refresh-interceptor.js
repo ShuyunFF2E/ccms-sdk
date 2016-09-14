@@ -10,15 +10,16 @@ const localStorage = window.localStorage;
 const Date = window.Date;
 const JSON = window.JSON;
 
-const REQUEST_TOKEN_STORAGE_KEY = 'ccmsRequestCredential';
 const REQUEST_TOKEN_HEADER = 'X-TOKEN';
 const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
 const REQUEST_WHITE_LIST = [];
 
 let needToRefreshToken = false;
+
+export const REQUEST_TOKEN_STORAGE_KEY = 'ccmsRequestCredential';
+
 let redirectToLogin = () => {
 };
-
 export function setAuthFailedBehavior(fn) {
 	redirectToLogin = fn;
 }
@@ -58,18 +59,18 @@ export default {
 
 	response(response) {
 
-		const ccmsRequestCredential = localStorage.getItem(REQUEST_TOKEN_STORAGE_KEY);
+		const ccmsRequestCredential = JSON.parse(localStorage.getItem(REQUEST_TOKEN_STORAGE_KEY));
 
 		const $http = injector.get('$http');
 		// 所有请求结束了才做refreshToken的操作,避免后端因为token被刷新而导致前一请求失败
-		if (needToRefreshToken && $http.pendingRequests.length === 1) {
+		if (needToRefreshToken && $http.pendingRequests.length === 0) {
 
+			needToRefreshToken = false;
 			// refresh token
 			$http.put(refreshTokenUrl, ccmsRequestCredential.refreshToken)
 				.then(response => {
 					// 更新localStorage中token信息
 					localStorage.setItem(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(response.data));
-					needToRefreshToken = false;
 				}, redirectToLogin);
 		}
 
