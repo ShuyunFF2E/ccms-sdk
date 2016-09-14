@@ -56,7 +56,7 @@ describe('token refresh interceptor', () => {
 
 		const token = {
 			id: '123456',
-			expireTime: '2016-09-13T16:06:30.886+0800'
+			expireTime: '2016-09-13T16:06:30.886+08:00'
 		};
 
 		localStorage.setItem(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(token));
@@ -79,7 +79,7 @@ describe('token refresh interceptor', () => {
 
 		const token = {
 			id: '123456',
-			expireTime: '2016-09-13T16:06:30.886+0800',
+			expireTime: '2016-09-13T16:06:30.886+08:00',
 			refreshToken: '12345678890'
 		};
 
@@ -100,7 +100,7 @@ describe('token refresh interceptor', () => {
 		let requestHandler, spy;
 		const token = {
 			id: '123456',
-			expireTime: '2016-09-13T16:06:30.886+0800',
+			expireTime: '2016-09-13T16:06:30.886+08:00',
 			refreshToken: '12345678890'
 		};
 		const newToken = 'xxxxxxxxxx';
