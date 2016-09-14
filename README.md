@@ -1,9 +1,9 @@
 ## angular-es-utils
 
-[![Build Status](https://img.shields.io/travis/kuitos/angular-es-utils.svg?style=flat)](https://travis-ci.org/kuitos/angular-es-utils)
-[![npm version](https://img.shields.io/npm/v/angular-es-utils.svg?style=flat)](https://www.npmjs.com/package/angular-es-utils)
-[![npm downloads](https://img.shields.io/npm/dt/angular-es-utils.svg?style=flat)](https://www.npmjs.com/package/angular-es-utils)
-[![coverage](https://img.shields.io/codecov/c/github/kuitos/angular-es-utils.svg?style=flat)](https://codecov.io/gh/kuitos/angular-es-utils)
+[![Build Status](https://img.shields.io/travis/ShuyunFF2E/ccms-sdk.svg?style=flat)](https://travis-ci.org/ShuyunFF2E/ccms-sdk)
+[![npm version](https://img.shields.io/npm/v/ccms-sdk.svg?style=flat)](https://www.npmjs.com/package/ccms-sdk)
+[![npm downloads](https://img.shields.io/npm/dt/ccms-sdk.svg?style=flat)](https://www.npmjs.com/package/ccms-sdk)
+[![coverage](https://img.shields.io/codecov/c/github/ShuyunFF2E/ccms-sdk.svg?style=flat)](https://codecov.io/gh/ShuyunFF2E/ccms-sdk)
 
 The es6 version of [angular utils](https://github.com/kuitos/angular-utils)     
 
@@ -14,7 +14,7 @@ npm i angular-es-utils -D
 ```
 
 ```js
-import {Inject} from 'angular-es-utils';
+import {} from 'ccms-sdk';
 ```
 
 #### 工具列表

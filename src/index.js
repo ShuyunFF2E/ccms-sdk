@@ -4,8 +4,12 @@
  * @since 2016-02-02
  */
 
-import { version } from '../package.json';
+import angular from 'angular';
 
-export {
-	version
-};
+import interceptors from './interceptors';
+
+export default angular
+	.module('ccms.sdk', [
+		interceptors
+	])
+	.name;
