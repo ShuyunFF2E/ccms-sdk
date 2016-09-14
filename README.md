@@ -15,7 +15,7 @@ npm i ccms-sdk --save
 
 ### Usage
 
-#### For ES5
+#### ES5
 
 ```html
 <script src="../node_modules/ccms-sdk/ccms-sdk.js"></script>
@@ -25,7 +25,7 @@ npm i ccms-sdk --save
 angular.module('app', ['ccms.sdk'])
 ```
 
-#### For ES6
+#### ES6
 
 ```js
 import angular from 'angular';
