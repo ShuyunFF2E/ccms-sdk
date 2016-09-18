@@ -36,5 +36,5 @@ angular.module('app', ['ccms.sdk'])
 ```
 
 #### API List
-* [interceptors](interceptors)
+* [interceptors](src/interceptors)
 	
