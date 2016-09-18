@@ -15,17 +15,7 @@ npm i ccms-sdk --save
 
 ### Usage
 
-#### ES5
-
-```html
-<script src="../node_modules/ccms-sdk/ccms-sdk.js"></script>
-```
-
-```js
-angular.module('app', ['ccms.sdk'])
-```
-
-#### ES6
+#### ES6 (直接使用包模块)
 
 ```js
 import angular from 'angular';
@@ -35,15 +25,16 @@ angular.module('app', [])
 	.config(['$httpProvider', $httpProvider => $httpProvider.interceptors.push(() => tokenRefreshInterceptor)])
 ```
 
-#### API List
-* interceptors
-	* token-refresh-interceptor  
-		根据当前token状态自动刷新token的拦截器
-		
-		```js
-		import angular from 'angular';
-		import tokenRefreshInterceptor from 'ccms-sdk/interceptors/token-refresh-interceptor';
+#### ES5 (依赖 ccms.sdk 模块)
 
-		angular.module('app', [])
-			.config(['$httpProvider', $httpProvider => $httpProvider.interceptors.push(() => tokenRefreshInterceptor)])
-		```
+```html
+<script src="../node_modules/ccms-sdk/es5/ccms-sdk.js"></script>
+```
+
+```js
+angular.module('app', ['ccms.sdk'])
+```
+
+#### API List
+* [interceptors](interceptors)
+	

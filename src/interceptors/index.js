@@ -7,7 +7,8 @@
 import angular from 'angular';
 
 import tokenRefreshInterceptor, {
-	REQUEST_TOKEN_STORAGE_KEY,
+	getRequestCredential,
+	setRequestCredential,
 	setAuthFailedBehavior,
 	setRefreshTokenUrl
 } from './token-refresh-interceptor';
@@ -16,8 +17,9 @@ export default angular
 	.module('ccms.utils.interceptors', [])
 	.constant('ccmsTokenRefreshInterceptor', tokenRefreshInterceptor)
 	.constant('$ccmsRefreshToken', {
+		getRequestCredential,
+		setRequestCredential,
 		setAuthFailedBehavior,
-		setRefreshTokenUrl,
-		REQUEST_TOKEN_STORAGE_KEY
+		setRefreshTokenUrl
 	})
 	.name;

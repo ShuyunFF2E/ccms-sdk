@@ -14,7 +14,7 @@ module.exports = {
 		'ccms-sdk.min': './src/index.js'
 	},
 	output: {
-		path: path.join(__dirname, 'dist'),
+		path: path.join(__dirname, 'es5'),
 		filename: '[name].js'
 	},
 	externals: {
@@ -28,7 +28,7 @@ module.exports = {
 				NODE_ENV: JSON.stringify('production')
 			}
 		}),
-		new CleanPlugin(['dist']),
+		new CleanPlugin(['es5']),
 		new webpack.optimize.UglifyJsPlugin({
 			include: /\.min\.js$/,
 			minimize: true

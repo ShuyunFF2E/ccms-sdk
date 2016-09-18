@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>interceptors</title>
+</head>
+<body ng-app="app" ng-controller="AppCtrl as app">
+
+<button type="button" ng-click="app.sendGetRequest()">send get request</button>
+<button type="button" ng-click="app.sendPostRequest()">send get request</button>
+<button type="button" ng-click="app.sendPutRequest()">send get request</button>
+
+
+<script src="../node_modules/angular/angular.js"></script>
+<script src="../es5/ccms-sdk.js"></script>
+
+<script>
+
+	angular.module('app', ['ccms.sdk'])
+			.config(['$httpProvider', 'ccmsTokenRefreshInterceptor', '$ccmsRefreshToken', function($httpProvider, ccmsTokenRefreshInterceptor, $ccmsRefreshToken) {
+
+				$ccmsRefreshToken.setRequestCredential({
+					id: '123456',
+					expireTime: new Date(Date.now() + 60 * 1000).toISOString(),
+					refreshToken: '12345678890'
+				});
+
+				// 设定刷新token的接口url
+				$ccmsRefreshToken.setRefreshTokenUrl('/examples/refresh-token.json');
+				// 设定认证失败后的逻辑(比如页面跳转等)
+				$ccmsRefreshToken.setAuthFailedBehavior(function() {
+					// ...do something like location redirect
+				});
+				$httpProvider.interceptors.push(function() {
+					return ccmsTokenRefreshInterceptor;
+				});
+			}])
+			.controller('AppCtrl', function($http) {
+				this.sendGetRequest = function() {
+					$http.get('/examples/token.json');
+				};
+				this.sendPostRequest = function() {
+					$http.post('/examples/token.json', {});
+				};
+				this.sendPutRequest = function() {
+					$http.put('/examples/token.json', 'hhhhh');
+				};
+			});
+
+
+</script>
+
+</body>
+</html>

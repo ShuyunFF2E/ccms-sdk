@@ -10,16 +10,15 @@ import { assert } from 'chai';
 import injector from 'angular-es-utils/injector';
 
 import tokenRefreshInterceptor, {
-	REQUEST_TOKEN_STORAGE_KEY,
 	setAuthFailedBehavior,
-	setRefreshTokenUrl
+	setRefreshTokenUrl,
+	getRequestCredential,
+	setRequestCredential
 } from '../token-refresh-interceptor';
-
-const localStorage = window.localStorage;
 
 describe('token refresh interceptor', () => {
 
-	let $http, $q, $httpBackend;
+	let $http, $q, $httpBackend, $rootScope;
 	const sandbox = sinon.sandbox.create();
 
 	const queryResponse = {name: 'kuitos'};
@@ -34,10 +33,11 @@ describe('token refresh interceptor', () => {
 			}]);
 
 		angular.mock.module('app');
-		angular.mock.inject((_$http_, _$q_, _$httpBackend_, _$injector_) => {
+		angular.mock.inject((_$http_, _$q_, _$httpBackend_, _$injector_, _$rootScope_) => {
 			$http = _$http_;
 			$q = _$q_;
 			$httpBackend = _$httpBackend_;
+			$rootScope = _$rootScope_;
 			angular.element(document.body).data('$injector', _$injector_);
 			sandbox.stub(injector, 'get', _$injector_.get);
 		});
@@ -49,7 +49,6 @@ describe('token refresh interceptor', () => {
 
 	afterEach(() => {
 		sandbox.restore();
-		localStorage.removeItem(REQUEST_TOKEN_STORAGE_KEY);
 	});
 
 	it('should\'t do anything expect X-TOKEN header setting in old system which has no refreshToken prop in storage', done => {
@@ -59,7 +58,7 @@ describe('token refresh interceptor', () => {
 			expireTime: '2016-09-13T16:06:30.886+08:00'
 		};
 
-		localStorage.setItem(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(token));
+		setRequestCredential(token);
 
 		$q.all([$http.get('/test/1'), $http.get('/test/2')]).then(response => {
 			const [responseA, responseB] = response;
@@ -83,16 +82,23 @@ describe('token refresh interceptor', () => {
 			refreshToken: '12345678890'
 		};
 
-		localStorage.setItem(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(token));
+		setRequestCredential(token);
 
 		const spy = sandbox.spy();
 		setAuthFailedBehavior(spy);
 
-		$http.get('/test/1');
-		$http.get('/test/2');
-		$httpBackend.flush();
+		$http.get('/test/1').catch(e => {
+			assert.instanceOf(e, TypeError);
+			assert.equal(getRequestCredential(), null);
+		});
 
-		assert.equal(spy.callCount, 2);
+		$http.get('/test/2').catch(e => {
+			assert.instanceOf(e, TypeError);
+			assert.equal(spy.callCount, 2);
+			assert.equal(getRequestCredential(), null);
+		});
+
+		$rootScope.$digest();
 	});
 
 	describe('token not expired but have keeping over 30 minute', () => {
@@ -109,7 +115,7 @@ describe('token refresh interceptor', () => {
 		const originalNow = Date.now();
 		beforeEach(() => {
 			Date.now = () => Date.parse(token.expireTime) - 10 * 60 * 1000;
-			localStorage.setItem(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(token));
+			setRequestCredential(token);
 			setRefreshTokenUrl(refreshTokenUrl);
 
 			spy = sandbox.spy(() => {
@@ -134,7 +140,7 @@ describe('token refresh interceptor', () => {
 			$httpBackend.flush();
 
 			assert.equal(spy.callCount, 1);
-			assert.equal(JSON.parse(localStorage.getItem(REQUEST_TOKEN_STORAGE_KEY)).id, newToken);
+			assert.equal(getRequestCredential().id, newToken);
 
 			$http.get('/test/1').then(response => {
 				assert.equal(response.config.headers['X-TOKEN'], newToken);
@@ -145,12 +151,15 @@ describe('token refresh interceptor', () => {
 
 		it('call redirect action when refresh api invoked failed', () => {
 			requestHandler.respond(401);
+
 			const spy = sandbox.spy();
 			setAuthFailedBehavior(spy);
+
 			$http.get('/test/1');
 			$httpBackend.flush();
 
 			assert.equal(spy.callCount, 1);
+			assert.equal(getRequestCredential(), null);
 		});
 
 	});
