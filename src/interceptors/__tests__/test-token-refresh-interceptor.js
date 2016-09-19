@@ -23,6 +23,7 @@ describe('token refresh interceptor', () => {
 
 	const queryResponse = {name: 'kuitos'};
 	const queryResponse1 = {name: 'kuitosx'};
+	const tokenHeader = 'X-TOKEN';
 
 	beforeEach(() => {
 
@@ -65,8 +66,8 @@ describe('token refresh interceptor', () => {
 			assert.deepEqual(queryResponse, responseA.data);
 			assert.deepEqual(queryResponse1, responseB.data);
 
-			assert.equal(responseA.config.headers['X-TOKEN'], token.id);
-			assert.equal(responseB.config.headers['X-TOKEN'], token.id);
+			assert.equal(responseA.config.headers[tokenHeader], token.id);
+			assert.equal(responseB.config.headers[tokenHeader], token.id);
 
 			done();
 		});
@@ -121,7 +122,9 @@ describe('token refresh interceptor', () => {
 			spy = sandbox.spy(() => {
 				return [200, {...token, ...{id: newToken}}];
 			});
-			requestHandler = $httpBackend.whenPUT(refreshTokenUrl, token.refreshToken).respond(spy);
+			requestHandler = $httpBackend.whenPUT(refreshTokenUrl, token.refreshToken, headers => {
+				return headers[tokenHeader] === getRequestCredential().id;
+			}).respond(spy);
 		});
 
 		afterEach(() => {
@@ -131,10 +134,10 @@ describe('token refresh interceptor', () => {
 		it('token should be refresh in storage but not reflect the request immediately', () => {
 
 			$http.get('/test/1').then(response => {
-				assert.equal(response.config.headers['X-TOKEN'], token.id);
+				assert.equal(response.config.headers[tokenHeader], token.id);
 			});
 			$http.get('/test/2').then(response => {
-				assert.equal(response.config.headers['X-TOKEN'], token.id);
+				assert.equal(response.config.headers[tokenHeader], token.id);
 			});
 
 			$httpBackend.flush();
@@ -143,7 +146,7 @@ describe('token refresh interceptor', () => {
 			assert.equal(getRequestCredential().id, newToken);
 
 			$http.get('/test/1').then(response => {
-				assert.equal(response.config.headers['X-TOKEN'], newToken);
+				assert.equal(response.config.headers[tokenHeader], newToken);
 			});
 
 			$httpBackend.flush();

@@ -86,7 +86,7 @@ export default {
 
 			needToRefreshToken = false;
 			// refresh token
-			$http.put(refreshTokenUrl, credential.refreshToken)
+			$http.put(refreshTokenUrl, credential.refreshToken, {headers: {[REQUEST_TOKEN_HEADER]: credential.id}})
 				.then(response => {
 					// 更新localStorage中token信息
 					localStorage.setItem(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(response.data));
