@@ -17,18 +17,18 @@
 <script>
 
 	angular.module('app', ['ccms.sdk'])
-			.config(['$httpProvider', 'ccmsTokenRefreshInterceptor', '$ccmsAuth', function($httpProvider, ccmsTokenRefreshInterceptor, $ccmsRefreshToken) {
+			.config(['$httpProvider', 'ccmsTokenRefreshInterceptor', '$ccmsAuth', function($httpProvider, ccmsTokenRefreshInterceptor, $ccmsAuth) {
 
-				$ccmsRefreshToken.setRequestCredential({
+				$ccmsAuth.setRequestCredential({
 					id: '123456',
 					expireTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
 					refreshToken: '12345678890'
 				});
 
 				// 设定刷新token的接口url
-				$ccmsRefreshToken.setRefreshTokenUrl('/examples/refresh-token.json');
+				$ccmsAuth.setRefreshTokenUrl('/examples/refresh-token.json');
 				// 设定认证失败后的逻辑(比如页面跳转等)
-				$ccmsRefreshToken.setAuthFailedBehavior(function() {
+				$ccmsAuth.setAuthFailedBehavior(function() {
 					// ...do something like location redirect
 					console.log('auth failed');
 				});
