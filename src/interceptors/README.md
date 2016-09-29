@@ -37,3 +37,5 @@
 		 	});
 		 });
    	```
+   	
+   	[demo](examples/interceptors.html)
