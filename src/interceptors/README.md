@@ -38,4 +38,4 @@
 		 });
    	```
    	
-   	[demo](examples/interceptors.html)
+   	[demo](../../examples/interceptors.html)
