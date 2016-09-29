@@ -34,6 +34,6 @@
 			});
 			$httpProvider.interceptors.push(function() {
 		 		return ccmsTokenRefreshInterceptor;
-		 	})];
+		 	});
 		 });
    	```
