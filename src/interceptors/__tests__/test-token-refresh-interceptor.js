@@ -9,12 +9,8 @@ import sinon from 'sinon';
 import { assert } from 'chai';
 import injector from 'angular-es-utils/injector';
 
-import tokenRefreshInterceptor, {
-	setAuthFailedBehavior,
-	setRefreshTokenUrl,
-	getRequestCredential,
-	setRequestCredential
-} from '../token-refresh-interceptor';
+import tokenRefreshInterceptor, { setAuthFailedBehavior, setRefreshTokenUrl } from '../token-refresh-interceptor';
+import { getRequestCredential, setRequestCredential } from '../../credentials';
 
 describe('token refresh interceptor', () => {
 

@@ -5,33 +5,27 @@
  */
 
 import injector from 'angular-es-utils/injector';
+import { getRequestCredential, setRequestCredential, removeRequestCredential } from '../credentials';
 
-const localStorage = window.localStorage;
 const Date = window.Date;
-const JSON = window.JSON;
 
 const REQUEST_TOKEN_HEADER = 'X-TOKEN';
 const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
 const REQUEST_WHITE_LIST = [];
 
 let needToRefreshToken = false;
-let execAuthFailure = () => {
-};
-
-const REQUEST_TOKEN_STORAGE_KEY = 'ccmsRequestCredential';
-
-export function getRequestCredential() {
-	return JSON.parse(localStorage.getItem(REQUEST_TOKEN_STORAGE_KEY));
-}
-
-export function setRequestCredential(credential) {
-	localStorage.setItem(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(credential));
-}
+let execAuthFailure = () => {};
 
 export function setAuthFailedBehavior(fn = execAuthFailure) {
+
 	execAuthFailure = () => {
-		fn();
-		localStorage.removeItem(REQUEST_TOKEN_STORAGE_KEY);
+
+		try {
+			fn();
+		} finally {
+			removeRequestCredential();
+		}
+
 		const ex = new TypeError('credential was expired or had been removed, pls set it before the get action!');
 		console.error(ex);
 		return injector.get('$q').reject(ex);
@@ -89,7 +83,7 @@ export default {
 			$http.put(refreshTokenUrl, credential.refreshToken, {headers: {[REQUEST_TOKEN_HEADER]: credential.id}})
 				.then(response => {
 					// 更新localStorage中token信息
-					localStorage.setItem(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(response.data));
+					setRequestCredential(response.data);
 				}, execAuthFailure);
 		}
 

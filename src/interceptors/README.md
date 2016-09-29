@@ -8,7 +8,8 @@
 	
    	```js
 	import angular from 'angular';
-	import tokenRefreshInterceptor, { setAuthFailedBehavior, setRefreshTokenUrl, setRequestCredential } from 'ccms-sdk/interceptors/token-refresh-interceptor';
+	import tokenRefreshInterceptor, { setAuthFailedBehavior, setRefreshTokenUrl } from 'ccms-sdk/interceptors/token-refresh-interceptor';
+	import { setRequestCredential } from 'ccms-sdk/credentials';
 	
 	setRequestCredential({} // your token);
 	setRefreshTokenUrl('https://api.xx.com/xx/xx');
@@ -22,13 +23,13 @@
    	
    	```js
    	angular.module('app', [])
-		.config(['$httpProvider', 'ccmsTokenRefreshInterceptor', '$ccmsRefreshToken', function($httpProvider, ccmsTokenRefreshInterceptor, $ccmsRefreshToken) {
+		.config(['$httpProvider', 'ccmsTokenRefreshInterceptor', '$ccmsAuth', function($httpProvider, ccmsTokenRefreshInterceptor, $ccmsAuth) {
 
-			$ccmsRefreshToken.setRequestCredential({} // your token);
+			$ccmsAuth.setRequestCredential({} // your token);
 			// 设定刷新token的接口url
-			$ccmsRefreshToken.setRefreshTokenUrl('https://api.xx.com/xx/xx');
+			$ccmsAuth.setRefreshTokenUrl('https://api.xx.com/xx/xx');
 			// 设定认证失败后的逻辑(比如页面跳转等)
-			$ccmsRefreshToken.setAuthFailedBehavior(function() {
+			$ccmsAuth.setAuthFailedBehavior(function() {
 				// ...do something like location redirect
 			});
 			$httpProvider.interceptors.push(function() {

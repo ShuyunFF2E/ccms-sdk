@@ -7,8 +7,8 @@
 <body ng-app="app" ng-controller="AppCtrl as app">
 
 <button type="button" ng-click="app.sendGetRequest()">send get request</button>
-<button type="button" ng-click="app.sendPostRequest()">send get request</button>
-<button type="button" ng-click="app.sendPutRequest()">send get request</button>
+<button type="button" ng-click="app.sendPostRequest()">send post request</button>
+<button type="button" ng-click="app.sendPutRequest()">send put request</button>
 
 
 <script src="../node_modules/angular/angular.js"></script>
@@ -17,11 +17,11 @@
 <script>
 
 	angular.module('app', ['ccms.sdk'])
-			.config(['$httpProvider', 'ccmsTokenRefreshInterceptor', '$ccmsRefreshToken', function($httpProvider, ccmsTokenRefreshInterceptor, $ccmsRefreshToken) {
+			.config(['$httpProvider', 'ccmsTokenRefreshInterceptor', '$ccmsAuth', function($httpProvider, ccmsTokenRefreshInterceptor, $ccmsRefreshToken) {
 
 				$ccmsRefreshToken.setRequestCredential({
 					id: '123456',
-					expireTime: new Date(Date.now() + 60 * 1000).toISOString(),
+					expireTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
 					refreshToken: '12345678890'
 				});
 
@@ -30,6 +30,7 @@
 				// 设定认证失败后的逻辑(比如页面跳转等)
 				$ccmsRefreshToken.setAuthFailedBehavior(function() {
 					// ...do something like location redirect
+					console.log('auth failed');
 				});
 				$httpProvider.interceptors.push(function() {
 					return ccmsTokenRefreshInterceptor;
