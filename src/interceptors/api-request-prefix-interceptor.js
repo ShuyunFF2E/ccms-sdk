@@ -6,6 +6,7 @@
 
 const NON_STATIC_FILE = /^(?!.*\.\w*(\?.*)?$).+$/;
 const isDynamicRequest = url => NON_STATIC_FILE.test(url);
+const isLocalRequest = url => !/^(http|https):\/\//.test(url);
 
 let apiRequestPrefix = '';
 export function setApiRequestPrefix(prefix) {
@@ -16,8 +17,9 @@ export default {
 
 	request(config) {
 
-		if (isDynamicRequest(config.url)) {
-			config.url = apiRequestPrefix + config.url;
+		const url = config.url;
+		if (isLocalRequest(url) && isDynamicRequest(url)) {
+			config.url = apiRequestPrefix + url;
 		}
 
 		return config;

@@ -16,6 +16,8 @@ describe('token refresh interceptor', () => {
 	let $http, $httpBackend;
 	const sandbox = sinon.sandbox.create();
 	const prefix = 'http://xx/xx/xx';
+	const staticRequest = '/test/a.html';
+	const domainApiRequest = 'http://xx.xx.com/test/a.html';
 	setApiRequestPrefix(prefix);
 
 	beforeEach(() => {
@@ -35,7 +37,8 @@ describe('token refresh interceptor', () => {
 		});
 
 		$httpBackend.whenGET(prefix + '/test/1').respond(200);
-		$httpBackend.whenGET('/test/a.html').respond(200);
+		$httpBackend.whenGET(staticRequest).respond(200);
+		$httpBackend.whenGET(domainApiRequest).respond(200);
 	});
 
 	afterEach(() => {
@@ -56,6 +59,15 @@ describe('token refresh interceptor', () => {
 
 		$http.get('/test/a.html').then(response => {
 			assert.equal(response.config.url, '/test/a.html');
+		});
+
+		$httpBackend.flush();
+	});
+
+	it('api request which fulfill domain should not be prefixed', () => {
+
+		$http.get(domainApiRequest).then(response => {
+			assert.equal(response.config.url, domainApiRequest);
 		});
 
 		$httpBackend.flush();
