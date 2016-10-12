@@ -4,6 +4,7 @@ module.exports = function(config) {
 
 	config.set(Object.assign(base, {
 		browsers: ['Chrome'],
-		reporters: ['mocha']
+		reporters: ['mocha'],
+		plugins: ['karma-mocha','karma-webpack', 'karma-mocha-reporter', 'karma-chrome-launcher']
 	}));
 };

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body ng-app="test" ng-controller="testCtrl">
+	<button onclick="getTest()">get</button>
+	<button onclick="postTest()">post</button>
+	<button onclick="putTest()">put</button>
+
+	<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="../es5/ccms-sdk.js"></script>
+
+	<script>
+
+
+		setAuthFailedBehaviorJq(function () {
+			alert("say no!");
+		});
+
+		ccmsTokenRefreshInterceptorJq();
+
+		function getTest() {
+			$.get("token.json")
+					.then(function () {
+						console.log("get success!")
+					}, function () {
+						console.log("get failed!")
+					});
+		}
+
+		function postTest() {
+			$.post("token.json", {})
+					.then(function () {
+						console.log("post success!")
+					}, function () {
+						console.log("post failed!")
+					});
+		}
+
+		function putTest() {
+			$.ajax({
+				method: "put",
+				url: "token.json",
+				data: "fuck test"
+			}).then(function () {
+				console.log("put success!")
+			}, function () {
+				console.log("put failed!")
+			});
+		}
+	</script>
+</body>
+</html>
