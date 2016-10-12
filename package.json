@@ -1,6 +1,6 @@
 {
   "name": "ccms-sdk",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "ccms fe sdk written by es2015+",
   "main": "./index.js",
   "scripts": {
