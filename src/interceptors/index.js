@@ -7,10 +7,9 @@
 import angular from 'angular';
 
 import tokenRefreshInterceptor, { setAuthFailedBehavior, setRefreshTokenUrl } from './token-refresh-interceptor';
-import tokenRefreshInterceptorJq, { setAuthFailedBehaviorJq } from './token-refresh-interceptor-jq';
+import tokenRefreshInterceptorJq, {setAuthFailedBehavior as setAuthFailedBehaviorJq} from './token-refresh-interceptor-jq';
 import { getRequestCredential, setRequestCredential } from '../credentials';
 
-export {tokenRefreshInterceptorJq as ccmsTokenRefreshInterceptorJq, setAuthFailedBehaviorJq};
 export default angular
 	.module('ccms.utils.interceptors', [])
 	.constant('ccmsTokenRefreshInterceptor', tokenRefreshInterceptor)
@@ -21,3 +20,10 @@ export default angular
 		setRefreshTokenUrl
 	})
 	.name;
+
+// 为es5提供调用
+if (!window.ccmsSdk) window.ccmsSdk = {};
+Object.assign(window.ccmsSdk, {
+	setAuthFailedBehavior: setAuthFailedBehaviorJq,
+	tokenRefreshInterceptor: tokenRefreshInterceptorJq
+});

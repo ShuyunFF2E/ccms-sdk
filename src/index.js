@@ -6,7 +6,7 @@
 
 import angular from 'angular';
 
-import interceptors, {ccmsTokenRefreshInterceptorJq, setAuthFailedBehaviorJq} from './interceptors';
+import interceptors from './interceptors';
 
 export default angular
 	.module('ccms.sdk', [
@@ -14,4 +14,3 @@ export default angular
 	])
 	.name;
 
-export {ccmsTokenRefreshInterceptorJq, setAuthFailedBehaviorJq};

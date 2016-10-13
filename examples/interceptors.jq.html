@@ -4,52 +4,38 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<body ng-app="test" ng-controller="testCtrl">
-	<button onclick="getTest()">get</button>
-	<button onclick="postTest()">post</button>
-	<button onclick="putTest()">put</button>
+<body>
+	<button onclick="testQ.getTest()">get</button>
+	<button onclick="testQ.postTest()">post</button>
+	<button onclick="testQ.putTest()">put</button>
 
+	<script src="../node_modules/angular/angular.min.js"></script>
 	<script src="../node_modules/jquery/dist/jquery.min.js"></script>
 	<script src="../es5/ccms-sdk.js"></script>
 
 	<script>
 
-
-		setAuthFailedBehaviorJq(function () {
-			alert("say no!");
+		var ccmsSdk = window.ccmsSdk;
+		ccmsSdk.setAuthFailedBehavior(function () {
+			console.log("you are out of time,bro.");
 		});
+		$.ajaxSetup(ccmsSdk.tokenRefreshInterceptor);
 
-		ccmsTokenRefreshInterceptorJq();
-
-		function getTest() {
-			$.get("token.json")
-					.then(function () {
-						console.log("get success!")
-					}, function () {
-						console.log("get failed!")
-					});
-		}
-
-		function postTest() {
-			$.post("token.json", {})
-					.then(function () {
-						console.log("post success!")
-					}, function () {
-						console.log("post failed!")
-					});
-		}
-
-		function putTest() {
-			$.ajax({
-				method: "put",
-				url: "token.json",
-				data: "fuck test"
-			}).then(function () {
-				console.log("put success!")
-			}, function () {
-				console.log("put failed!")
-			});
-		}
+		var testQ = {
+			getTest: function () {
+				$.get("/ccms-sdk/examples/token.json");
+			},
+			postTest: function () {
+				$.post("/ccms-sdk/examples/token.json", {});
+			},
+			putTest: function () {
+				$.ajax({
+					method: "put",
+					data: "sadas",
+					url: "/ccms-sdk/examples/token.json"
+				})
+			}
+		};
 	</script>
 </body>
 </html>
