@@ -23,16 +23,16 @@
 
 		var testQ = {
 			getTest: function () {
-				$.get("/ccms-sdk/examples/token.json");
+				$.get("/examples/token.json");
 			},
 			postTest: function () {
-				$.post("/ccms-sdk/examples/token.json", {});
+				$.post("/examples/token.json", {});
 			},
 			putTest: function () {
 				$.ajax({
 					method: "put",
 					data: "sadas",
-					url: "/ccms-sdk/examples/token.json"
+					url: "/examples/token.json"
 				})
 			}
 		};

@@ -37,13 +37,13 @@
 			}])
 			.controller('AppCtrl', function($http) {
 				this.sendGetRequest = function() {
-					$http.get('/ccms-sdk/examples/token.json');
+					$http.get('/examples/token.json');
 				};
 				this.sendPostRequest = function() {
-					$http.post('/ccms-sdk/examples/token.json', {});
+					$http.post('/examples/token.json', {});
 				};
 				this.sendPutRequest = function() {
-					$http.put('/ccms-sdk/examples/token.json', 'hhhhh');
+					$http.put('/examples/token.json', 'hhhhh');
 				};
 			});
 
