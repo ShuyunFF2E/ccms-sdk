@@ -2,7 +2,9 @@
 
 * api-request-prefix-interceptor
 	
-	对API(区别于静态文件ajax请求)请求加前缀
+	对 API 接口(区别于静态文件ajax请求)请求加前缀
+	
+	> 提示：由于 CORS 限制，跨域请求想携带当前域的 cookie 信息需对请求设置 withCredentials:true
 	
 	ES6
 	
