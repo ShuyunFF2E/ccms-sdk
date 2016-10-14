@@ -8,6 +8,7 @@ import angular from 'angular';
 
 import tokenRefreshInterceptor, { setAuthFailedBehavior, setRefreshTokenUrl } from './token-refresh-interceptor';
 import tokenRefreshInterceptorJq, {setAuthFailedBehavior as setAuthFailedBehaviorJq} from './token-refresh-interceptor-jq';
+import apiRequestPrefixInterceptor, { setApiRequestPrefix } from './api-request-prefix-interceptor';
 import { getRequestCredential, setRequestCredential } from '../credentials';
 
 export default angular
@@ -18,6 +19,10 @@ export default angular
 		setRequestCredential,
 		setAuthFailedBehavior,
 		setRefreshTokenUrl
+	})
+	.constant('apiRequestPrefixInterceptor', {
+		origin: apiRequestPrefixInterceptor,
+		setApiRequestPrefix
 	})
 	.name;
 
