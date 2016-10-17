@@ -15,10 +15,21 @@
 
 	<script>
 
-		var ccmsSdk = window.ccmsSdk;
-		ccmsSdk.setAuthFailedBehavior(function () {
-			console.log("you are out of time,bro.");
+		var ccmsSdk = window.ccmsSdk,
+			$ccmsAuth = ccmsSdk.$ccmsAuth;
+
+		$ccmsAuth.setRequestCredential({
+			id: '123456',
+			expireTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+			refreshToken: '12345678890'
 		});
+
+		$ccmsAuth.setRefreshTokenUrl('/examples/refresh-token.json');
+
+		ccmsSdk.setAuthFailedBehavior(function () {
+			console.log("auth failed.");
+		});
+
 		$.ajaxSetup(ccmsSdk.tokenRefreshInterceptor);
 
 		var testQ = {

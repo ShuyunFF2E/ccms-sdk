@@ -3,6 +3,17 @@
  */
 import { getRequestCredential, setRequestCredential, removeRequestCredential } from '../credentials';
 
+const Date = window.Date;
+const $ = window.$;
+
+const REQUEST_TOKEN_HEADER = 'X-TOKEN';
+const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
+const REQUEST_WHITE_LIST = [];
+
+let needToRefreshToken = false;
+let execAuthFailure = () => {
+};
+
 export function setAuthFailedBehavior(fn = execAuthFailure) {
 	execAuthFailure = () => {
 		try {
@@ -16,18 +27,11 @@ export function setAuthFailedBehavior(fn = execAuthFailure) {
 	};
 }
 
-
-const Date = window.Date;
-const $ = window.$;
-
-const REQUEST_TOKEN_HEADER = 'X-TOKEN';
-const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
-const REQUEST_WHITE_LIST = [];
-
-let needToRefreshToken = false;
-let execAuthFailure = () => {
-};
 let refreshTokenUrl = '';
+export function setRefreshTokenUrl(url) {
+	refreshTokenUrl = url;
+	REQUEST_WHITE_LIST.push(url);
+}
 
 export default {
 	beforeSend: function(xhr) {
