@@ -1,12 +1,11 @@
 /**
- * Created by Sadalsuud on 2016/10/11.
+ * @author qix
+ * @homepage https://github.com/qixman/
+ * @since 2016-10-11
  */
 import { getRequestCredential, setRequestCredential, removeRequestCredential } from '../credentials';
+import { Date, $, REQUEST_TOKEN_HEADER } from 'interceptor-metadata';
 
-const Date = window.Date;
-const $ = window.$;
-
-const REQUEST_TOKEN_HEADER = 'X-TOKEN';
 const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
 const REQUEST_WHITE_LIST = [];
 

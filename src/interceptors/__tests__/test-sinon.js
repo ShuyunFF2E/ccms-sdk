@@ -1,38 +1,39 @@
 /*
-*  @qix
-* */
+ *  @qix
+ * */
 
 import sinon from 'sinon';
 import JQuery from 'jquery';
 import {assert} from 'chai';
 
-describe('test sinon', function() {
+describe('token refresh interceptor -jq version', function() {
 
+	const $ = JQuery;
 	// fake server
-	let fServer;
+	let fServer = sinon.fakeServer.create();
+
+	const queryResponse = {name: 'kuitos'};
+	const queryResponse1 = {name: 'qix'};
 
 	beforeEach(function() {
-		fServer = sinon.fakeServer.create();
 		fServer.respondWith('GET', '/test/1',
-			[200, {'Content-Type': 'application/json'}, '{"name": "qix"}']);
+			[200, {'Content-Type': 'application/json'}, JSON.stringify(queryResponse)]);
+		fServer.respondWith('GET', '/test/2',
+			[200, {'Content-Type': 'application/json'}, JSON.stringify(queryResponse1)]);
 	});
 
 	afterEach(function() {
 		fServer.restore();
 	});
 
-	it('should reponse as preset.', function() {
-		let callback = sinon.spy();
+	it('should\'t do anything expect X-TOKEN header setting in old system which has no refreshToken prop in storage.', function() {
 
-		JQuery.ajax({
-			url: '/test/1',
-			success: callback
+		$.get('/test/1').then(response => {
+			assert.deepEqual(response, queryResponse);
 		});
 
 		fServer.respond();
-
-		assert.equal(callback.calledWith({name: 'qix'}), true);
-	})
+	});
 });
 
 
