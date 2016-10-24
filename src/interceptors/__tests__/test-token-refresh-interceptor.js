@@ -109,7 +109,7 @@ describe('token refresh interceptor', () => {
 		const newToken = 'xxxxxxxxxx';
 		const refreshTokenUrl = '/test/refreshToken';
 
-		const originalNow = Date.now();
+		const originalNow = Date.now;
 		beforeEach(() => {
 			Date.now = () => Date.parse(token.expireTime) - 10 * 60 * 1000;
 			setRequestCredential(token);

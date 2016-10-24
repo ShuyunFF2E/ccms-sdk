@@ -4,7 +4,7 @@
  * @since 2016-10-11
  */
 import { getRequestCredential, setRequestCredential, removeRequestCredential } from '../credentials';
-import { Date, $, REQUEST_TOKEN_HEADER } from 'interceptor-metadata';
+import { Date, $, REQUEST_TOKEN_HEADER } from './interceptor-metadata';
 
 const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
 const REQUEST_WHITE_LIST = [];

@@ -72,7 +72,10 @@ describe('token refresh interceptor -jq version', function() {
 
 	describe('token not expired but have keeping over 30 minute', () => {
 
-		let requestHandler, spy;
+		let spy;
+		let fakeXHR = sinon.useFakeXMLHttpRequest();
+		let requestHandler;
+
 		const token = {
 			id: '123456',
 			expireTime: '2016-09-13T16:06:30.886+08:00',
@@ -82,9 +85,14 @@ describe('token refresh interceptor -jq version', function() {
 		const newToken = 'xxxxxxxxxx';
 		const refreshTokenUrl = '/test/refreshToken';
 
-		const originalNow = Date.now();
+		const originalNow = Date.now;
 
 		beforeEach(() => {
+
+			fakeXHR.onCreate = xhr => {
+				if(xhr.method === 'put') requestHandler = xhr;
+			}
+
 			Date.now = () => Date.parse(token.expireTime) - 10 * 60 * 1000;
 			setRequestCredential(token);
 			setRefreshTokenUrl(refreshTokenUrl);
@@ -94,9 +102,8 @@ describe('token refresh interceptor -jq version', function() {
 			});
 
 			fServer.respondWith('put', refreshTokenUrl, request => {
-				requestHandler = request;
 				if (request.headers[tokenHeader] === getRequestCredential().id) {
-					requestHandler.respond(spy);
+					request.respond(spy);
 				}
 			});
 		});
@@ -127,7 +134,7 @@ describe('token refresh interceptor -jq version', function() {
 		});
 
 		it('call redirect action when refresh api invoked failed', () => {
-			requestHandler.respond([401]);
+			requestHandler.respond(401);
 
 			const spy = sandbox.spy();
 			setAuthFailedBehavior(spy);
