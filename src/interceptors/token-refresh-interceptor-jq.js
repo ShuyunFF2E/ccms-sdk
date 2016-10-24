@@ -14,15 +14,18 @@ let execAuthFailure = () => {
 };
 
 export function setAuthFailedBehavior(fn = execAuthFailure) {
-	execAuthFailure = () => {
-		try {
-			fn();
-		} finally {
-			removeRequestCredential();
+	execAuthFailure = (jqXHR) => {
+		return () => {
+			try {
+				fn();
+			} finally {
+				removeRequestCredential();
+			}
+			const ex = new TypeError('credential was expired or had been removed, pls set it before the get action!');
+			console.error(ex);
+			jqXHR.abort();
+			return $.Deferred().reject(ex);
 		}
-		const ex = new TypeError('credential was expired or had been removed, pls set it before the get action!');
-		console.error(ex);
-		$.Deferred().reject(ex);
 	};
 }
 
@@ -36,8 +39,7 @@ export default {
 	beforeSend: function(xhr) {
 		const credential = getRequestCredential();
 		if (!credential) {
-			execAuthFailure();
-			return;
+			return execAuthFailure(xhr)();
 		}
 
 		xhr.setRequestHeader(REQUEST_TOKEN_HEADER, credential.id);
@@ -51,11 +53,11 @@ export default {
 			if (USER_SESSION_AVAILABLE_TIME >= expireTime - now && expireTime - now >= 0) {
 				needToRefreshToken = true;
 			} else if (expireTime - now < 0) { // token失效
-				return execAuthFailure();
+				return execAuthFailure(xhr)();
 			}
 		}
 	},
-	complete: function() {
+	complete: function(xhr) {
 		// 如果请求能正常响应,说明 storage 里的状态是存在的,所以这里不做判断
 		const credential = getRequestCredential();
 
@@ -68,7 +70,7 @@ export default {
 				.then(response => {
 					// 更新localStorage中token信息
 					setRequestCredential(response);
-				}, execAuthFailure);
+				}, execAuthFailure(xhr));
 		}
 	}
 };
