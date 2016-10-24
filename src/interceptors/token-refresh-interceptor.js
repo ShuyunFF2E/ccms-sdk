@@ -6,7 +6,7 @@
 
 import injector from 'angular-es-utils/injector';
 import { getRequestCredential, setRequestCredential, removeRequestCredential } from '../credentials';
-import { Date, REQUEST_TOKEN_HEADER } from 'interceptor-metadata';
+import { Date, REQUEST_TOKEN_HEADER } from './interceptor-metadata';
 
 const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
 const REQUEST_WHITE_LIST = [];
