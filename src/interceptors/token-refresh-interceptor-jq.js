@@ -14,7 +14,7 @@ let execAuthFailure = () => {
 };
 
 export function setAuthFailedBehavior(fn = execAuthFailure) {
-	execAuthFailure = (jqXHR) => {
+	execAuthFailure = jqXHR => {
 		return () => {
 			try {
 				fn();
@@ -23,9 +23,8 @@ export function setAuthFailedBehavior(fn = execAuthFailure) {
 			}
 			const ex = new TypeError('credential was expired or had been removed, pls set it before the get action!');
 			console.error(ex);
-			jqXHR.abort();
-			return $.Deferred().reject(ex);
-		}
+			jqXHR.abort(ex);
+		};
 	};
 }
 
@@ -62,7 +61,7 @@ export default {
 		const credential = getRequestCredential();
 
 		// 所有请求结束了才做refreshToken的操作,避免后端因为token被刷新而导致前一请求失败
-		if (needToRefreshToken && $.active <= 1) {
+		if (needToRefreshToken/* && $.active <= 1*/) {
 
 			needToRefreshToken = false;
 			// refresh token
