@@ -16,6 +16,6 @@
   	angular.module('app', ['ccms.sdk'])
   		.controller('$ccmsAuth', function($ccmsAuth) {
 			console.log($ccmsAuth.getRequestCredential());
-  	});
+  		});
   	```
 
