@@ -37,4 +37,5 @@ angular.module('app', ['ccms.sdk'])
 
 ### API
 * [interceptors](src/interceptors)
+* [credentials](src/credentials)
 	
