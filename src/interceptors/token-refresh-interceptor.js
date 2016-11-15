@@ -14,11 +14,11 @@ const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
 const REQUEST_WHITE_LIST = [];
 
 let needToRefreshToken = false;
-let execAuthFailure = () => {};
+let execAuthFailure = function() {};
 
 export function setAuthFailedBehavior(fn = execAuthFailure) {
 
-	execAuthFailure = config => {
+	execAuthFailure = rejection => {
 
 		try {
 			fn();
@@ -28,11 +28,10 @@ export function setAuthFailedBehavior(fn = execAuthFailure) {
 
 		const ex = new TypeError('Unauthorized! Credential was expired or had been removed, pls set it before the get action!');
 		console.error(ex);
-		return injector.get('$q').reject({
-			status: 401,
-			config: config,
-			statusText: 'Unauthorized!'
-		});
+
+		rejection.status = rejection.status || 401;
+		rejection.statusText = rejection.statusText || 'Unauthorized!';
+		return injector.get('$q').reject(rejection);
 	};
 }
 
@@ -49,7 +48,7 @@ export default {
 		const credential = getRequestCredential();
 		// storage 里的状态有可能已经失效
 		if (!credential) {
-			return execAuthFailure(config);
+			return execAuthFailure({config});
 		}
 
 		config.headers[REQUEST_TOKEN_HEADER] = credential.id;
@@ -66,7 +65,7 @@ export default {
 			if (USER_SESSION_AVAILABLE_TIME >= expireTime - now && expireTime - now >= 0) {
 				needToRefreshToken = true;
 			} else if (expireTime - now < 0) { // token失效
-				return execAuthFailure();
+				return execAuthFailure({config});
 			}
 		}
 
