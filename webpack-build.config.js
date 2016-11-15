@@ -10,8 +10,8 @@ var CleanPlugin = require('clean-webpack-plugin');
 module.exports = {
 	devtool: 'cheap-source-map',
 	entry: {
-		'ccms-sdk': './src/index.js',
-		'ccms-sdk.min': './src/index.js'
+		'ccms-sdk': './src/shell.js',
+		'ccms-sdk.min': './src/shell.js'
 	},
 	output: {
 		path: path.join(__dirname, 'es5'),
