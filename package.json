@@ -1,6 +1,6 @@
 {
   "name": "ccms-sdk",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "ccms fe sdk written by es2015+",
   "scripts": {
     "build": "rm -fr lib && NODE_ENV=production babel src --out-dir lib --ignore **/__tests__,shell.js & webpack --config webpack-build.config.js && cp -R es5 lib && cp package.json lib/package.json",
