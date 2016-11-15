@@ -18,7 +18,7 @@ let execAuthFailure = () => {};
 
 export function setAuthFailedBehavior(fn = execAuthFailure) {
 
-	execAuthFailure = () => {
+	execAuthFailure = config => {
 
 		try {
 			fn();
@@ -26,9 +26,13 @@ export function setAuthFailedBehavior(fn = execAuthFailure) {
 			removeRequestCredential();
 		}
 
-		const ex = new TypeError('credential was expired or had been removed, pls set it before the get action!');
+		const ex = new TypeError('Unauthorized! Credential was expired or had been removed, pls set it before the get action!');
 		console.error(ex);
-		return injector.get('$q').reject(ex);
+		return injector.get('$q').reject({
+			status: 401,
+			config: config,
+			statusText: 'Unauthorized!'
+		});
 	};
 }
 
@@ -45,7 +49,7 @@ export default {
 		const credential = getRequestCredential();
 		// storage 里的状态有可能已经失效
 		if (!credential) {
-			return execAuthFailure();
+			return execAuthFailure(config);
 		}
 
 		config.headers[REQUEST_TOKEN_HEADER] = credential.id;
