@@ -4,27 +4,23 @@
  * @since 2016-10-11
  */
 import { getRequestCredential, setRequestCredential, removeRequestCredential } from '../credentials';
-import { Date, REQUEST_TOKEN_HEADER } from './interceptor-metadata';
+import { Date, REQUEST_TOKEN_HEADER, USER_SESSION_AVAILABLE_TIME } from './metadata';
 
-const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
 const REQUEST_WHITE_LIST = [];
 
 let needToRefreshToken = false;
-let execAuthFailure = () => {
-	return () => {};
-};
+let execAuthFailure = function() {};
 export function setAuthFailedBehavior(fn = execAuthFailure) {
+
 	execAuthFailure = jqXHR => {
-		return () => {
-			try {
-				fn();
-			} finally {
-				removeRequestCredential();
-			}
-			const ex = new TypeError('credential was expired or had been removed, pls set it before the get action!');
-			console.error(ex);
-			jqXHR.abort(ex);
-		};
+		try {
+			fn();
+		} finally {
+			removeRequestCredential();
+		}
+		const ex = new TypeError('credential was expired or had been removed, pls set it before the get action!');
+		console.error(ex);
+		jqXHR.abort(ex);
 	};
 }
 
@@ -36,9 +32,10 @@ export function setRefreshTokenUrl(url) {
 
 export default {
 	beforeSend: function(xhr, config) {
+
 		const credential = getRequestCredential();
 		if (!credential) {
-			execAuthFailure(xhr)();
+			execAuthFailure(xhr);
 			return;
 		}
 
@@ -54,12 +51,13 @@ export default {
 			if (USER_SESSION_AVAILABLE_TIME >= expireTime - now && expireTime - now >= 0) {
 				needToRefreshToken = true;
 			} else if (expireTime - now < 0) { // token失效
-				execAuthFailure(xhr)();
-				return;
+				execAuthFailure(xhr);
 			}
 		}
+
 	},
 	complete: function(xhr) {
+
 		// 如果请求能正常响应,说明 storage 里的状态是存在的,所以这里不做判断
 		const credential = getRequestCredential();
 		const $ = window.$;
@@ -78,9 +76,8 @@ export default {
 			}).done(response => {
 				// 更新localStorage中token信息
 				setRequestCredential(JSON.parse(response));
-			}).fail(execAuthFailure(xhr));
+			}).fail(() => execAuthFailure(xhr));
 		}
+
 	}
 };
-
-

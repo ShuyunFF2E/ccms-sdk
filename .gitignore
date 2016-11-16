@@ -1,6 +1,5 @@
-# Created by .ignore support plugin (hsz.mobi)
-node_modules
-coverage
-lib
+node_modules/
+coverage/
+lib/
 .idea/
-es5
+es5/
