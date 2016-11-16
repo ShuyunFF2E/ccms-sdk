@@ -150,7 +150,7 @@ describe('token refresh interceptor -jq version', function() {
 		});
 
 		it('call redirect action when refresh api invoked failed', () => {
-			fServer.respondWith('put', refreshTokenUrl, [401, {}, ""]);
+			fServer.respondWith('put', refreshTokenUrl, [401, {}, '']);
 
 			const spy = sandbox.spy();
 			setAuthFailedBehavior(spy);
