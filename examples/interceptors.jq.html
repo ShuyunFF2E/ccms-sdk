@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+	<button onclick="testQ.getTest()">get</button>
+	<button onclick="testQ.postTest()">post</button>
+	<button onclick="testQ.putTest()">put</button>
+
+	<script src="../node_modules/angular/angular.min.js"></script>
+	<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="../es5/ccms-sdk.js"></script>
+
+	<script>
+
+		var ccmsSdk = window.ccmsSdk,
+			$ccmsAuth = ccmsSdk.$ccmsAuth;
+
+		$ccmsAuth.setRequestCredential({
+			id: '123456',
+			expireTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+			refreshToken: '12345678890'
+		});
+
+		$ccmsAuth.setRefreshTokenUrl('/examples/refresh-token.json');
+
+		ccmsSdk.setAuthFailedBehavior(function () {
+			console.log("auth failed.");
+		});
+
+		$.ajaxSetup(ccmsSdk.tokenRefreshInterceptor);
+
+		var testQ = {
+			getTest: function () {
+				$.get("/examples/token.json");
+			},
+			postTest: function () {
+				$.post("/examples/token.json", {});
+			},
+			putTest: function () {
+				$.ajax({
+					method: "put",
+					data: "sadas",
+					url: "/examples/token.json"
+				})
+			}
+		};
+	</script>
+</body>
+</html>

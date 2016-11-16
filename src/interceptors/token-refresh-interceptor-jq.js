@@ -1,10 +1,8 @@
 /**
- * @author Kuitos
- * @homepage https://github.com/kuitos/
- * @since 2016-09-09
+ * @author qix
+ * @homepage https://github.com/qixman/
+ * @since 2016-10-11
  */
-
-import injector from 'angular-es-utils/injector';
 import { getRequestCredential, setRequestCredential, removeRequestCredential } from '../credentials';
 import { Date, REQUEST_TOKEN_HEADER } from './interceptor-metadata';
 
@@ -12,24 +10,21 @@ const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
 const REQUEST_WHITE_LIST = [];
 
 let needToRefreshToken = false;
-let execAuthFailure = function() {};
-
+let execAuthFailure = () => {
+	return () => {};
+};
 export function setAuthFailedBehavior(fn = execAuthFailure) {
-
-	execAuthFailure = rejection => {
-
-		try {
-			fn();
-		} finally {
-			removeRequestCredential();
-		}
-
-		const ex = new TypeError('Unauthorized! Credential was expired or had been removed, pls set it before the get action!');
-		console.error(ex);
-
-		rejection.status = rejection.status || 401;
-		rejection.statusText = rejection.statusText || 'Unauthorized!';
-		return injector.get('$q').reject(rejection);
+	execAuthFailure = jqXHR => {
+		return () => {
+			try {
+				fn();
+			} finally {
+				removeRequestCredential();
+			}
+			const ex = new TypeError('credential was expired or had been removed, pls set it before the get action!');
+			console.error(ex);
+			jqXHR.abort(ex);
+		};
 	};
 }
 
@@ -40,19 +35,15 @@ export function setRefreshTokenUrl(url) {
 }
 
 export default {
-
-	request(config) {
-
+	beforeSend: function(xhr, config) {
 		const credential = getRequestCredential();
-		// storage 里的状态有可能已经失效
 		if (!credential) {
-			return execAuthFailure({config});
+			execAuthFailure(xhr)();
+			return;
 		}
 
-		config.headers[REQUEST_TOKEN_HEADER] = credential.id;
-
-		// 白名单之外的url做校验
-		// TODO 兼容处理,如果拿不到refreshToken说明系统还未升级,则不做刷新token逻辑
+		xhr.setRequestHeader(REQUEST_TOKEN_HEADER, credential.id);
+		xhr[REQUEST_TOKEN_HEADER] = credential.id;
 		if (credential.refreshToken && REQUEST_WHITE_LIST.indexOf(config.url) === -1) {
 
 			const expireTime = Date.parse(credential.expireTime);
@@ -63,32 +54,33 @@ export default {
 			if (USER_SESSION_AVAILABLE_TIME >= expireTime - now && expireTime - now >= 0) {
 				needToRefreshToken = true;
 			} else if (expireTime - now < 0) { // token失效
-				return execAuthFailure({config});
+				execAuthFailure(xhr)();
+				return;
 			}
 		}
-
-		return config;
 	},
-
-	response(response) {
-
+	complete: function(xhr) {
 		// 如果请求能正常响应,说明 storage 里的状态是存在的,所以这里不做判断
 		const credential = getRequestCredential();
+		const $ = window.$;
 
-		const $http = injector.get('$http');
 		// 所有请求结束了才做refreshToken的操作,避免后端因为token被刷新而导致前一请求失败
-		if (needToRefreshToken && $http.pendingRequests.length === 0) {
-
+		if (needToRefreshToken && $.active <= 1) {
 			needToRefreshToken = false;
+			xhr[REQUEST_TOKEN_HEADER] = credential.id;
 			// refresh token
-			$http.put(refreshTokenUrl, credential.refreshToken, {headers: {[REQUEST_TOKEN_HEADER]: credential.id}})
-				.then(response => {
-					// 更新localStorage中token信息
-					setRequestCredential(response.data);
-				}, execAuthFailure);
+			$.ajax({
+				async: false,
+				url: refreshTokenUrl,
+				method: 'PUT',
+				data: credential.refreshToken,
+				headers: {[REQUEST_TOKEN_HEADER]: credential.id}
+			}).done(response => {
+				// 更新localStorage中token信息
+				setRequestCredential(JSON.parse(response));
+			}).fail(execAuthFailure(xhr));
 		}
-
-		return response;
 	}
-
 };
+
+
