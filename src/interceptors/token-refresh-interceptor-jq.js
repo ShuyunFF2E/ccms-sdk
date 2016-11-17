@@ -3,34 +3,14 @@
  * @homepage https://github.com/qixman/
  * @since 2016-10-11
  */
-import { getRequestCredential, setRequestCredential, removeRequestCredential } from '../credentials';
-import { Date, REQUEST_TOKEN_HEADER, USER_SESSION_AVAILABLE_TIME } from './metadata';
-
-const REQUEST_WHITE_LIST = [];
+import { getRequestCredential, setRequestCredential } from '../credentials';
+import { Date, REQUEST_TOKEN_HEADER, USER_SESSION_AVAILABLE_TIME, REQUEST_WHITE_LIST } from './metadata';
+import { execAuthFailure, refreshTokenUrl } from './token-refresh-interceptor';
 
 let needToRefreshToken = false;
-let execAuthFailure = function() {};
-export function setAuthFailedBehavior(fn = execAuthFailure) {
-
-	execAuthFailure = jqXHR => {
-		try {
-			fn();
-		} finally {
-			removeRequestCredential();
-		}
-		const ex = new TypeError('credential was expired or had been removed, pls set it before the get action!');
-		console.error(ex);
-		jqXHR.abort(ex);
-	};
-}
-
-let refreshTokenUrl = '';
-export function setRefreshTokenUrl(url) {
-	refreshTokenUrl = url;
-	REQUEST_WHITE_LIST.push(url);
-}
 
 export default {
+
 	beforeSend: function(xhr, config) {
 
 		const credential = getRequestCredential();

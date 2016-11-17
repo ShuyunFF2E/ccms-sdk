@@ -9,7 +9,8 @@
  * @since 2016-11-16
  */
 
-import tokenRefreshInterceptorJq, {setAuthFailedBehavior, setRefreshTokenUrl} from './token-refresh-interceptor-jq';
+import tokenRefreshInterceptorJq from './token-refresh-interceptor-jq';
+import { setRefreshTokenUrl, setAuthFailedBehavior } from './token-refresh-interceptor';
 import { getRequestCredential, setRequestCredential } from '../credentials';
 
 // 为es5提供调用

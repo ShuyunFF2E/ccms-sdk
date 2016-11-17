@@ -7,3 +7,4 @@
 export const Date = window.Date;
 export const REQUEST_TOKEN_HEADER = 'X-TOKEN';
 export const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
+export const REQUEST_WHITE_LIST = [];

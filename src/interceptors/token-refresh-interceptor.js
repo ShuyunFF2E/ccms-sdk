@@ -6,14 +6,11 @@
 
 import injector from 'angular-es-utils/injector';
 import { getRequestCredential, setRequestCredential, removeRequestCredential } from '../credentials';
-import { Date, REQUEST_TOKEN_HEADER } from './metadata';
-
-const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
-const REQUEST_WHITE_LIST = [];
+import { Date, REQUEST_TOKEN_HEADER, USER_SESSION_AVAILABLE_TIME, REQUEST_WHITE_LIST } from './metadata';
 
 let needToRefreshToken = false;
-let execAuthFailure = function() {};
 
+export let execAuthFailure = function() {};
 export function setAuthFailedBehavior(fn = execAuthFailure) {
 
 	execAuthFailure = rejection => {
@@ -27,13 +24,18 @@ export function setAuthFailedBehavior(fn = execAuthFailure) {
 		const ex = new TypeError('Unauthorized! Credential was expired or had been removed, pls set it before the get action!');
 		console.error(ex);
 
-		rejection.status = rejection.status || 401;
-		rejection.statusText = rejection.statusText || 'Unauthorized!';
-		return injector.get('$q').reject(rejection);
+		if (typeof rejection.abort === 'function') {
+			rejection.abort(ex);
+		} else {
+			rejection.status = rejection.status || 401;
+			rejection.statusText = rejection.statusText || 'Unauthorized!';
+			return injector.get('$q').reject(rejection);
+		}
+
 	};
 }
 
-let refreshTokenUrl = '';
+export let refreshTokenUrl = '';
 export function setRefreshTokenUrl(url) {
 	refreshTokenUrl = url;
 	REQUEST_WHITE_LIST.push(url);
