@@ -88,7 +88,7 @@
 	ES5
 	```js
 			<script src="../node_modules/jquery/dist/jquery.min.js"></script>
-        	<script src="../es5/ccms-sdk-jq.min.js"></script>
+        	<script src="../es5/interceptor-jq.min.js"></script>
         	...
         	var ccmsSdk = window.ccmsSdk,
             	$ccmsAuth = ccmsSdk.$ccmsAuth;
