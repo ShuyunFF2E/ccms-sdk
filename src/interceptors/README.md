@@ -70,12 +70,13 @@
    	```
    	
 * token-refresh-interceptor-jq
+
 	token-refresh-interceptor的jq版本，为了兼容使用jq ajax进行http请求的情况。
 	
 	ES6
 	```js
 		import $ from 'jquery';
-    	import tokenRefreshInterceptor, { setAuthFailedBehavior, setRefreshTokenUrl } from 'ccms-sdk/interceptors/token-refresh-interceptor';
+    	import tokenRefreshInterceptor, { setAuthFailedBehavior, setRefreshTokenUrl } from 'ccms-sdk/interceptors/token-refresh-interceptor-jq';
     	import { setRequestCredential } from 'ccms-sdk/credentials';
     	
     	$.ajaxSetup(tokenRefreshInterceptor);
