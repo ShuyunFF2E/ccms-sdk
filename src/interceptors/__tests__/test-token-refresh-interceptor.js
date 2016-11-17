@@ -84,13 +84,15 @@ describe('token refresh interceptor', () => {
 		const spy = sandbox.spy();
 		setAuthFailedBehavior(spy);
 
-		$http.get('/test/1').catch(e => {
-			assert.instanceOf(e, TypeError);
+		$http.get('/test/1').catch(rejection => {
+			assert.equal(rejection.status, 401);
+			assert.equal(rejection.statusText, 'Unauthorized!');
 			assert.equal(getRequestCredential(), null);
 		});
 
-		$http.get('/test/2').catch(e => {
-			assert.instanceOf(e, TypeError);
+		$http.get('/test/2').catch(rejection => {
+			assert.equal(rejection.status, 401);
+			assert.equal(rejection.statusText, 'Unauthorized!');
 			assert.equal(spy.callCount, 2);
 			assert.equal(getRequestCredential(), null);
 		});

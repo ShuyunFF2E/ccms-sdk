@@ -6,17 +6,17 @@
 
 import injector from 'angular-es-utils/injector';
 import { getRequestCredential, setRequestCredential, removeRequestCredential } from '../credentials';
-import { Date, REQUEST_TOKEN_HEADER } from './interceptor-metadata';
+import { Date, REQUEST_TOKEN_HEADER } from './metadata';
 
 const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
 const REQUEST_WHITE_LIST = [];
 
 let needToRefreshToken = false;
-let execAuthFailure = () => {};
+let execAuthFailure = function() {};
 
 export function setAuthFailedBehavior(fn = execAuthFailure) {
 
-	execAuthFailure = () => {
+	execAuthFailure = rejection => {
 
 		try {
 			fn();
@@ -24,9 +24,12 @@ export function setAuthFailedBehavior(fn = execAuthFailure) {
 			removeRequestCredential();
 		}
 
-		const ex = new TypeError('credential was expired or had been removed, pls set it before the get action!');
+		const ex = new TypeError('Unauthorized! Credential was expired or had been removed, pls set it before the get action!');
 		console.error(ex);
-		return injector.get('$q').reject(ex);
+
+		rejection.status = rejection.status || 401;
+		rejection.statusText = rejection.statusText || 'Unauthorized!';
+		return injector.get('$q').reject(rejection);
 	};
 }
 
@@ -43,7 +46,7 @@ export default {
 		const credential = getRequestCredential();
 		// storage 里的状态有可能已经失效
 		if (!credential) {
-			return execAuthFailure();
+			return execAuthFailure({config});
 		}
 
 		config.headers[REQUEST_TOKEN_HEADER] = credential.id;
@@ -60,7 +63,7 @@ export default {
 			if (USER_SESSION_AVAILABLE_TIME >= expireTime - now && expireTime - now >= 0) {
 				needToRefreshToken = true;
 			} else if (expireTime - now < 0) { // token失效
-				return execAuthFailure();
+				return execAuthFailure({config});
 			}
 		}
 

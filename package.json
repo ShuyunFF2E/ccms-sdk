@@ -1,9 +1,10 @@
 {
   "name": "ccms-sdk",
-  "version": "2.0.3",
+  "version": "2.0.6",
   "description": "ccms fe sdk written by es2015+",
+  "main": "./index.js",
   "scripts": {
-    "build": "rm -fr lib && cross-env NODE_ENV=production babel src --out-dir lib --ignore **/__tests__,index.js & webpack --config webpack-build.config.js && cp -R es5 lib && cp package.json lib/package.json",
+    "build": "rm -fr lib && NODE_ENV=production babel src --out-dir lib --ignore **/__tests__,shell.js & webpack --config webpack-build.config.js && cp -R es5 lib && cp package.json lib/package.json",
     "codecheck": "NODE_EVN=test eslint src",
     "prepush": "npm test",
     "test": "npm run codecheck & npm run cover",
@@ -48,8 +49,8 @@
   },
   "dependencies": {
     "angular": "^1.5.3",
-    "angular-es-utils": "^1.3.2",
-    "js-cookie": "^2.1.3",
-    "jquery": "^3.1.1"
+    "angular-es-utils": "^2.0.0",
+    "jquery": "^3.1.1",
+    "js-cookie": "^2.1.3"
   }
 }
