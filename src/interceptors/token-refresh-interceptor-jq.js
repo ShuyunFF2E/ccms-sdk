@@ -70,7 +70,6 @@ export default {
 			xhr[REQUEST_TOKEN_HEADER] = credential.id;
 			// refresh token
 			$.ajax({
-				async: false,
 				url: refreshTokenUrl,
 				method: 'PUT',
 				data: credential.refreshToken,

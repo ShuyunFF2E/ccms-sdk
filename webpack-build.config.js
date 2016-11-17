@@ -11,7 +11,9 @@ module.exports = {
 	devtool: 'cheap-source-map',
 	entry: {
 		'ccms-sdk': './src/shell.js',
-		'ccms-sdk.min': './src/shell.js'
+		'ccms-sdk.min': './src/shell.js',
+		'interceptor-jq': './src/interceptors/shell-jq.js',
+		'interceptor-jq.min': './src/interceptors/shell-jq.js'
 	},
 	output: {
 		path: path.join(__dirname, 'es5'),
