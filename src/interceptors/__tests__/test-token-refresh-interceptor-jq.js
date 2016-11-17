@@ -17,6 +17,7 @@ describe('token refresh interceptor -jq version', function() {
 
 	const queryResponse = {name: 'kuitos'};
 	const queryResponse1 = {name: 'qix'};
+	const queryResponse2 = {name: 'heyman'};
 	const tokenHeader = 'X-TOKEN';
 
 
@@ -31,6 +32,9 @@ describe('token refresh interceptor -jq version', function() {
 			[200, {'Content-Type': 'application/json'}, JSON.stringify(queryResponse)]);
 		fServer.respondWith('GET', '/test/2',
 			[200, {'Content-Type': 'application/json'}, JSON.stringify(queryResponse1)]);
+		fServer.respondWith('GET', '/test/3',
+			[200, {'Content-Type': 'application/json'}, JSON.stringify(queryResponse2)]);
+
 	});
 
 	afterEach(function() {
@@ -136,6 +140,10 @@ describe('token refresh interceptor -jq version', function() {
 				assert.equal(xhr[tokenHeader], token.id);
 			});
 
+			//此处多次调用respond，是因为上面的请求callback中包含了新的请求
+			//此处这个新的请求为拦截器中的put请求，用来执行刷新token操作
+			//下同
+			fServer.respond();
 			fServer.respond();
 
 			assert.equal(spy.callCount, 1);
@@ -146,6 +154,7 @@ describe('token refresh interceptor -jq version', function() {
 			});
 
 			fServer.respond();
+			fServer.respond();
 
 		});
 
@@ -155,7 +164,8 @@ describe('token refresh interceptor -jq version', function() {
 			const spy = sandbox.spy();
 			setAuthFailedBehavior(spy);
 
-			JQuery.get('/test/1');
+			JQuery.get('/test/3');
+			fServer.respond();
 			fServer.respond();
 
 			assert.equal(spy.callCount, 1);

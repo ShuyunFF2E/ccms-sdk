@@ -69,4 +69,39 @@
 		 });
    	```
    	
-   	[demo](../../examples/interceptors.html)
+* token-refresh-interceptor-jq
+
+	token-refresh-interceptor的jq版本，为了兼容使用jq ajax进行http请求的情况。
+	
+	ES6
+	```js
+		import $ from 'jquery';
+    	import tokenRefreshInterceptor, { setAuthFailedBehavior, setRefreshTokenUrl } from 'ccms-sdk/interceptors/token-refresh-interceptor-jq';
+    	import { setRequestCredential } from 'ccms-sdk/credentials';
+    	
+    	$.ajaxSetup(tokenRefreshInterceptor);
+    	
+    	setRequestCredential({} // your token);
+    	setRefreshTokenUrl('https://api.xx.com/xx/xx');
+    	setAuthFailedBehavior(() => location.href = 'login.html');
+	```
+	
+	ES5
+	```js
+			<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+        	<script src="../es5/interceptor-jq.min.js"></script>
+        	...
+        	var ccmsSdk = window.ccmsSdk,
+            	$ccmsAuth = ccmsSdk.$ccmsAuth;
+            
+            	$ccmsAuth.setRequestCredential({} // your token);
+            	$ccmsAuth.setRefreshTokenUrl('https://api.xx.com/xx/xx');
+				$ccmsAuth.setAuthFailedBehavior(function(){
+					// ...do something like location redirect
+				});
+            
+				$.ajaxSetup(ccmsSdk.tokenRefreshInterceptor);
+        	
+	```
+   	
+   	[demo](../../examples/interceptors-jq.html)
