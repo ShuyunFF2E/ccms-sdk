@@ -4,7 +4,6 @@
  * @since 2016-09-09
  */
 
-import injector from 'angular-es-utils/injector';
 import { getRequestCredential, setRequestCredential, removeRequestCredential } from '../credentials';
 import { Date, REQUEST_TOKEN_HEADER, USER_SESSION_AVAILABLE_TIME, REQUEST_WHITE_LIST } from './metadata';
 
@@ -29,6 +28,7 @@ export function setAuthFailedBehavior(fn = execAuthFailure) {
 		} else {
 			rejection.status = rejection.status || 401;
 			rejection.statusText = rejection.statusText || 'Unauthorized!';
+			const injector = require('angular-es-utils/injector');
 			return injector.get('$q').reject(rejection);
 		}
 
@@ -77,7 +77,7 @@ export default {
 		// 如果请求能正常响应,说明 storage 里的状态是存在的,所以这里不做判断
 		const credential = getRequestCredential();
 
-		const $http = injector.get('$http');
+		const $http = require('angular-es-utils/injector').get('$http');
 		// 所有请求结束了才做refreshToken的操作,避免后端因为token被刷新而导致前一请求失败
 		if (needToRefreshToken && $http.pendingRequests.length === 0) {
 
