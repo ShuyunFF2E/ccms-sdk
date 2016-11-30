@@ -33,6 +33,8 @@ describe('token refresh interceptor -jq version', function() {
 		fServer.respondWith('GET', '/test/3',
 			[200, {'Content-Type': 'application/json'}, JSON.stringify(queryResponse2)]);
 
+		window.self = window.top;
+
 	});
 
 	afterEach(function() {

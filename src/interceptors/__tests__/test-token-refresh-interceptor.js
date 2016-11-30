@@ -42,6 +42,8 @@ describe('token refresh interceptor', () => {
 		$httpBackend.whenGET('/test/1').respond(200, queryResponse);
 		$httpBackend.whenGET('/test/2').respond(200, queryResponse1);
 
+		window.self = window.top;
+
 	});
 
 	afterEach(() => {
