@@ -10,6 +10,7 @@ import { assert } from 'chai';
 import injector from 'angular-es-utils/injector';
 
 import tokenRefreshInterceptor, { setAuthFailedBehavior, setRefreshTokenUrl } from '../token-refresh-interceptor';
+import { CREDENTIAL_KEY_MAPPER } from '../metadata';
 import { getRequestCredential, setRequestCredential } from '../../credentials';
 
 describe('token refresh interceptor', () => {
@@ -17,9 +18,10 @@ describe('token refresh interceptor', () => {
 	let $http, $q, $httpBackend, $rootScope;
 	const sandbox = sinon.sandbox.create();
 
-	const queryResponse = {name: 'kuitos'};
-	const queryResponse1 = {name: 'kuitosx'};
+	const queryResponse = { name: 'kuitos' };
+	const queryResponse1 = { name: 'kuitosx' };
 	const tokenHeader = 'X-TOKEN';
+	const { expireTime, accessToken, refreshToken } = CREDENTIAL_KEY_MAPPER;
 
 	beforeEach(() => {
 
@@ -52,9 +54,10 @@ describe('token refresh interceptor', () => {
 
 	it('should\'t do anything expect X-TOKEN header setting in old system which has no refreshToken prop in storage', done => {
 
+		const { expireTime, accessToken } = CREDENTIAL_KEY_MAPPER;
 		const token = {
-			id: '123456',
-			expireTime: '2016-09-13T16:06:30.886+08:00'
+			[accessToken]: '123456',
+			[expireTime]: '2016-09-13T16:06:30.886+08:00'
 		};
 
 		setRequestCredential(token);
@@ -64,8 +67,8 @@ describe('token refresh interceptor', () => {
 			assert.deepEqual(queryResponse, responseA.data);
 			assert.deepEqual(queryResponse1, responseB.data);
 
-			assert.equal(responseA.config.headers[tokenHeader], token.id);
-			assert.equal(responseB.config.headers[tokenHeader], token.id);
+			assert.equal(responseA.config.headers[tokenHeader], token[accessToken]);
+			assert.equal(responseB.config.headers[tokenHeader], token[accessToken]);
 
 			done();
 		});
@@ -76,9 +79,9 @@ describe('token refresh interceptor', () => {
 	it('should call the failed behavior when token had expired', () => {
 
 		const token = {
-			id: '123456',
-			expireTime: '2016-09-13T16:06:30.886+08:00',
-			refreshToken: '12345678890'
+			[accessToken]: '123456',
+			[expireTime]: '2016-09-13T16:06:30.886+08:00',
+			[refreshToken]: '12345678890'
 		};
 
 		setRequestCredential(token);
@@ -106,24 +109,24 @@ describe('token refresh interceptor', () => {
 
 		let requestHandler, spy;
 		const token = {
-			id: '123456',
-			expireTime: '2016-09-13T16:06:30.886+08:00',
-			refreshToken: '12345678890'
+			[accessToken]: '123456',
+			[expireTime]: '2016-09-13T16:06:30.886+08:00',
+			[refreshToken]: '12345678890'
 		};
 		const newToken = 'xxxxxxxxxx';
 		const refreshTokenUrl = '/test/refreshToken';
 
 		const originalNow = Date.now;
 		beforeEach(() => {
-			Date.now = () => Date.parse(token.expireTime) - 10 * 60 * 1000;
+			Date.now = () => Date.parse(token[expireTime]) - 10 * 60 * 1000;
 			setRequestCredential(token);
 			setRefreshTokenUrl(refreshTokenUrl);
 
 			spy = sandbox.spy(() => {
-				return [200, {...token, ...{id: newToken}}];
+				return [200, { ...token, ...{ [accessToken]: newToken } }];
 			});
-			requestHandler = $httpBackend.whenPUT(refreshTokenUrl, token.refreshToken, headers => {
-				return headers[tokenHeader] === getRequestCredential().id;
+			requestHandler = $httpBackend.whenPUT(refreshTokenUrl, token[refreshToken], headers => {
+				return headers[tokenHeader] === getRequestCredential()[accessToken];
 			}).respond(spy);
 		});
 
@@ -134,16 +137,16 @@ describe('token refresh interceptor', () => {
 		it('token should be refresh in storage but not reflect the request immediately', () => {
 
 			$http.get('/test/1').then(response => {
-				assert.equal(response.config.headers[tokenHeader], token.id);
+				assert.equal(response.config.headers[tokenHeader], token[accessToken]);
 			});
 			$http.get('/test/2').then(response => {
-				assert.equal(response.config.headers[tokenHeader], token.id);
+				assert.equal(response.config.headers[tokenHeader], token[accessToken]);
 			});
 
 			$httpBackend.flush();
 
 			assert.equal(spy.callCount, 1);
-			assert.equal(getRequestCredential().id, newToken);
+			assert.equal(getRequestCredential()[accessToken], newToken);
 
 			$http.get('/test/1').then(response => {
 				assert.equal(response.config.headers[tokenHeader], newToken);

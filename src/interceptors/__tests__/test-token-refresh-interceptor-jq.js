@@ -5,8 +5,9 @@ import sinon from 'sinon';
 import JQuery from 'jquery';
 import { assert } from 'chai';
 import tokenRefreshInterceptor from '../token-refresh-interceptor-jq';
-import { setRefreshTokenUrl, setAuthFailedBehavior } from '../token-refresh-interceptor';
+import { setAuthFailedBehavior, setRefreshTokenUrl } from '../token-refresh-interceptor';
 import { getRequestCredential, setRequestCredential } from '../../credentials';
+import { CREDENTIAL_KEY_MAPPER } from '../metadata';
 
 describe('token refresh interceptor -jq version', function() {
 
@@ -18,6 +19,7 @@ describe('token refresh interceptor -jq version', function() {
 	const queryResponse1 = {name: 'qix'};
 	const queryResponse2 = {name: 'heyman'};
 	const tokenHeader = 'X-TOKEN';
+	const { accessToken, refreshToken, expireTime } = CREDENTIAL_KEY_MAPPER;
 
 	fServer.restore = function() {
 		this.responses = [];
@@ -43,8 +45,8 @@ describe('token refresh interceptor -jq version', function() {
 
 	it('should\'t do anything expect X-TOKEN header setting in old system which has no refreshToken prop in storage.', function() {
 		const token = {
-			id: '123456',
-			expireTime: '2016-09-13T16:06:30.886+08:00'
+			[accessToken]: '123456',
+			[expireTime]: '2016-09-13T16:06:30.886+08:00'
 		};
 
 		setRequestCredential(token);
@@ -52,11 +54,11 @@ describe('token refresh interceptor -jq version', function() {
 		const [spy1, spy2] = [
 			sandbox.spy((response, status, xhr) => {
 				assert.deepEqual(response, queryResponse);
-				assert.equal(xhr[tokenHeader], token.id);
+				assert.equal(xhr[tokenHeader], token[accessToken]);
 			}),
 			sandbox.spy((response, status, xhr) => {
 				assert.deepEqual(response, queryResponse1);
-				assert.equal(xhr[tokenHeader], token.id);
+				assert.equal(xhr[tokenHeader], token[accessToken]);
 			})
 		];
 		JQuery.get('/test/1').done(spy1);
@@ -70,9 +72,9 @@ describe('token refresh interceptor -jq version', function() {
 
 	it('should call the fialed behavior when token had expired', () => {
 		const token = {
-			id: '123456',
-			expireTime: '2016-09-13T16:06:30.886+08:00',
-			refreshToken: '12345678890'
+			[accessToken]: '123456',
+			[expireTime]: '2016-09-13T16:06:30.886+08:00',
+			[refreshToken]: '12345678890'
 		};
 
 		setRequestCredential(token);
@@ -99,9 +101,9 @@ describe('token refresh interceptor -jq version', function() {
 		let spy;
 
 		const token = {
-			id: '123456',
-			expireTime: '2016-09-13T16:06:30.886+08:00',
-			refreshToken: '12345678890'
+			[accessToken]: '123456',
+			[expireTime]: '2016-09-13T16:06:30.886+08:00',
+			[refreshToken]: '12345678890'
 		};
 
 		const newToken = 'xxxxxxxxxx';
@@ -111,16 +113,16 @@ describe('token refresh interceptor -jq version', function() {
 
 		beforeEach(() => {
 
-			Date.now = () => Date.parse(token.expireTime) - 10 * 60 * 1000;
+			Date.now = () => Date.parse(token[expireTime]) - 10 * 60 * 1000;
 			setRequestCredential(token);
 			setRefreshTokenUrl(refreshTokenUrl);
 
 			spy = sandbox.spy(() => {
-				return [200, {}, JSON.stringify({...token, ...{id: newToken}})];
+				return [200, {}, JSON.stringify({...token, ...{[accessToken]: newToken}})];
 			});
 
 			fServer.respondWith('put', refreshTokenUrl, request => {
-				if (request.requestHeaders[tokenHeader] === getRequestCredential().id) {
+				if (request.requestHeaders[tokenHeader] === getRequestCredential()[accessToken]) {
 					request.respond(...spy());
 					return;
 				}
@@ -134,10 +136,10 @@ describe('token refresh interceptor -jq version', function() {
 
 		it('token should be refresh in storage but not reflect the request immediately', () => {
 			JQuery.get('/test/1').done((res, status, xhr) => {
-				assert.equal(xhr[tokenHeader], token.id);
+				assert.equal(xhr[tokenHeader], token[accessToken]);
 			});
 			JQuery.get('/test/2').done((res, status, xhr) => {
-				assert.equal(xhr[tokenHeader], token.id);
+				assert.equal(xhr[tokenHeader], token[accessToken]);
 			});
 
 			// 此处多次调用respond，是因为上面的请求callback中包含了新的请求
@@ -147,7 +149,7 @@ describe('token refresh interceptor -jq version', function() {
 			fServer.respond();
 
 			assert.equal(spy.callCount, 1);
-			assert.equal(getRequestCredential().id, newToken);
+			assert.equal(getRequestCredential()[accessToken], newToken);
 
 			JQuery.get('/test/1').done((res, status, xhr) => {
 				assert.equal(xhr[tokenHeader], newToken);
