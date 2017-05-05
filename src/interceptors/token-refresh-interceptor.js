@@ -22,6 +22,7 @@ export function setAuthFailedBehavior(fn = execAuthFailure) {
 		const ex = new TypeError('Unauthorized! Credential was expired or had been removed, pls set it before the get action!');
 		console.error(ex);
 
+		// 兼容 jquery 处理
 		if (typeof rejection.abort === 'function') {
 			rejection.abort(ex);
 		} else {
@@ -89,7 +90,7 @@ export default {
 				.then(response => {
 					// 更新localStorage中token信息
 					setRequestCredential(response.data);
-				}, execAuthFailure);
+				}, execAuthFailure).catch(rejection => console.error(rejection));
 		}
 
 		return response;
