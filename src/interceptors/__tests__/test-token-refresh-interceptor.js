@@ -161,7 +161,7 @@ describe('token refresh interceptor', () => {
 			const spy = sandbox.spy();
 			setAuthFailedBehavior(spy);
 
-			$http.get('/test/1');
+			$http.get('/test/1').catch();
 			$httpBackend.flush();
 
 			assert.equal(spy.callCount, 1);
