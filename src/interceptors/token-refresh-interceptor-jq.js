@@ -4,7 +4,14 @@
  * @since 2016-10-11
  */
 import { getRequestCredential, setRequestCredential } from '../credentials';
-import { CREDENTIAL_KEY_MAPPER, Date, REQUEST_TOKEN_HEADER, REQUEST_WHITE_LIST, USER_SESSION_AVAILABLE_TIME } from './metadata';
+import {
+	CREDENTIAL_KEY_MAPPER,
+	Date,
+	REQUEST_TOKEN_HEADER,
+	REQUEST_TOKEN_VALUE,
+	REQUEST_WHITE_LIST,
+	USER_SESSION_AVAILABLE_TIME
+} from './metadata';
 import { execAuthFailure, refreshTokenUrl } from './token-refresh-interceptor';
 
 let needToRefreshToken = false;
@@ -21,7 +28,7 @@ export default {
 		}
 
 		xhr.setRequestHeader(REQUEST_TOKEN_HEADER, credential[accessToken]);
-		xhr[REQUEST_TOKEN_HEADER] = credential[accessToken];
+		xhr[REQUEST_TOKEN_HEADER] = REQUEST_TOKEN_VALUE(credential[accessToken]);
 		if (credential[refreshToken] && REQUEST_WHITE_LIST.indexOf(config.url) === -1) {
 
 			const expireDateTime = Date.parse(credential[expireTime]);
@@ -51,9 +58,15 @@ export default {
 			// refresh token
 			$.ajax({
 				url: refreshTokenUrl,
-				method: 'PUT',
-				data: credential[refreshToken],
-				headers: {[REQUEST_TOKEN_HEADER]: credential[accessToken]}
+				method: 'POST',
+				data: {
+					refresh_token: credential[refreshToken],
+					grant_type: 'refresh_token'
+				},
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+					[REQUEST_TOKEN_HEADER]: REQUEST_TOKEN_VALUE(credential[accessToken])
+				}
 			}).done(response => {
 				// 更新localStorage中token信息
 				setRequestCredential(JSON.parse(response));

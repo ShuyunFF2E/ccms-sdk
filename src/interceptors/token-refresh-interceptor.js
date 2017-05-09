@@ -4,7 +4,14 @@
  * @since 2016-09-09
  */
 import { getRequestCredential, removeRequestCredential, setRequestCredential } from '../credentials';
-import { CREDENTIAL_KEY_MAPPER, Date, REQUEST_TOKEN_HEADER, REQUEST_WHITE_LIST, USER_SESSION_AVAILABLE_TIME } from './metadata';
+import {
+	CREDENTIAL_KEY_MAPPER,
+	Date,
+	REQUEST_TOKEN_HEADER,
+	REQUEST_TOKEN_VALUE,
+	REQUEST_WHITE_LIST,
+	USER_SESSION_AVAILABLE_TIME
+} from './metadata';
 
 let needToRefreshToken = false;
 
@@ -49,10 +56,10 @@ export default {
 		const { accessToken, refreshToken, expireTime } = CREDENTIAL_KEY_MAPPER;
 		// storage 里的状态有可能已经失效
 		if (!credential) {
-			return execAuthFailure({config});
+			return execAuthFailure({ config });
 		}
 
-		config.headers[REQUEST_TOKEN_HEADER] = credential[accessToken];
+		config.headers[REQUEST_TOKEN_HEADER] = REQUEST_TOKEN_VALUE(credential[accessToken]);
 
 		// 白名单之外的url做校验
 		// TODO 兼容处理,如果拿不到refreshToken说明系统还未升级,则不做刷新token逻辑
@@ -66,7 +73,7 @@ export default {
 			if (USER_SESSION_AVAILABLE_TIME >= expireDateTime - now && expireDateTime - now >= 0) {
 				needToRefreshToken = true;
 			} else if (expireDateTime - now < 0) { // token失效
-				return execAuthFailure({config});
+				return execAuthFailure({ config });
 			}
 		}
 
@@ -81,12 +88,19 @@ export default {
 
 		const injector = require('angular-es-utils/injector').default;
 		const $http = injector.get('$http');
+		const $httpParamSerializerJQLike = injector.get('$httpParamSerializerJQLike');
 		// 所有请求结束了才做refreshToken的操作,避免后端因为token被刷新而导致前一请求失败
 		if (needToRefreshToken && $http.pendingRequests.length === 0) {
 
 			needToRefreshToken = false;
 			// refresh token
-			$http.put(refreshTokenUrl, credential[refreshToken], { headers: { [REQUEST_TOKEN_HEADER]: credential[accessToken] } })
+			$http
+				.post(refreshTokenUrl, $httpParamSerializerJQLike({ refresh_token: credential[refreshToken], grant_type: 'refresh_token' }), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						[REQUEST_TOKEN_HEADER]: REQUEST_TOKEN_VALUE(credential[accessToken])
+					}
+				})
 				.then(response => {
 					// 更新localStorage中token信息
 					setRequestCredential(response.data);

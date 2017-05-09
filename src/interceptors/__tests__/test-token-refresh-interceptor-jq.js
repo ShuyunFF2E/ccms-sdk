@@ -7,7 +7,7 @@ import { assert } from 'chai';
 import tokenRefreshInterceptor from '../token-refresh-interceptor-jq';
 import { setAuthFailedBehavior, setRefreshTokenUrl } from '../token-refresh-interceptor';
 import { getRequestCredential, setRequestCredential } from '../../credentials';
-import { CREDENTIAL_KEY_MAPPER } from '../metadata';
+import { CREDENTIAL_KEY_MAPPER, REQUEST_TOKEN_HEADER as tokenHeader, REQUEST_TOKEN_VALUE } from '../metadata';
 
 describe('token refresh interceptor -jq version', function() {
 
@@ -15,10 +15,9 @@ describe('token refresh interceptor -jq version', function() {
 	const fServer = sinon.fakeServer.create();
 	const sandbox = sinon.sandbox.create();
 
-	const queryResponse = {name: 'kuitos'};
-	const queryResponse1 = {name: 'qix'};
-	const queryResponse2 = {name: 'heyman'};
-	const tokenHeader = 'X-TOKEN';
+	const queryResponse = { name: 'kuitos' };
+	const queryResponse1 = { name: 'qix' };
+	const queryResponse2 = { name: 'heyman' };
 	const { accessToken, refreshToken, expireTime } = CREDENTIAL_KEY_MAPPER;
 
 	fServer.restore = function() {
@@ -29,11 +28,11 @@ describe('token refresh interceptor -jq version', function() {
 
 	beforeEach(function() {
 		fServer.respondWith('GET', '/test/1',
-			[200, {'Content-Type': 'application/json'}, JSON.stringify(queryResponse)]);
+			[200, { 'Content-Type': 'application/json' }, JSON.stringify(queryResponse)]);
 		fServer.respondWith('GET', '/test/2',
-			[200, {'Content-Type': 'application/json'}, JSON.stringify(queryResponse1)]);
+			[200, { 'Content-Type': 'application/json' }, JSON.stringify(queryResponse1)]);
 		fServer.respondWith('GET', '/test/3',
-			[200, {'Content-Type': 'application/json'}, JSON.stringify(queryResponse2)]);
+			[200, { 'Content-Type': 'application/json' }, JSON.stringify(queryResponse2)]);
 
 		window.self = window.top;
 
@@ -43,7 +42,7 @@ describe('token refresh interceptor -jq version', function() {
 		fServer.restore();
 	});
 
-	it('should\'t do anything expect X-TOKEN header setting in old system which has no refreshToken prop in storage.', function() {
+	it('should\'t do anything expect Authorization header setting in old system which has no refreshToken prop in storage.', function() {
 		const token = {
 			[accessToken]: '123456',
 			[expireTime]: '2016-09-13T16:06:30.886+08:00'
@@ -54,11 +53,11 @@ describe('token refresh interceptor -jq version', function() {
 		const [spy1, spy2] = [
 			sandbox.spy((response, status, xhr) => {
 				assert.deepEqual(response, queryResponse);
-				assert.equal(xhr[tokenHeader], token[accessToken]);
+				assert.equal(xhr[tokenHeader], REQUEST_TOKEN_VALUE(token[accessToken]));
 			}),
 			sandbox.spy((response, status, xhr) => {
 				assert.deepEqual(response, queryResponse1);
-				assert.equal(xhr[tokenHeader], token[accessToken]);
+				assert.equal(xhr[tokenHeader], REQUEST_TOKEN_VALUE(token[accessToken]));
 			})
 		];
 		JQuery.get('/test/1').done(spy1);
@@ -118,10 +117,11 @@ describe('token refresh interceptor -jq version', function() {
 			setRefreshTokenUrl(refreshTokenUrl);
 
 			spy = sandbox.spy(() => {
-				return [200, {}, JSON.stringify({...token, ...{[accessToken]: newToken}})];
+				return [200, {}, JSON.stringify({ ...token, ...{ [accessToken]: newToken } })];
 			});
 
-			fServer.respondWith('put', refreshTokenUrl, request => {
+			fServer.respondWith('post', refreshTokenUrl, request => {
+				console.log(`jq request: ${request}`);
 				if (request.requestHeaders[tokenHeader] === getRequestCredential()[accessToken]) {
 					request.respond(...spy());
 					return;
@@ -136,10 +136,10 @@ describe('token refresh interceptor -jq version', function() {
 
 		it('token should be refresh in storage but not reflect the request immediately', () => {
 			JQuery.get('/test/1').done((res, status, xhr) => {
-				assert.equal(xhr[tokenHeader], token[accessToken]);
+				assert.equal(xhr[tokenHeader], REQUEST_TOKEN_VALUE(token[accessToken]));
 			});
 			JQuery.get('/test/2').done((res, status, xhr) => {
-				assert.equal(xhr[tokenHeader], token[accessToken]);
+				assert.equal(xhr[tokenHeader], REQUEST_TOKEN_VALUE(token[accessToken]));
 			});
 
 			// 此处多次调用respond，是因为上面的请求callback中包含了新的请求
@@ -152,7 +152,7 @@ describe('token refresh interceptor -jq version', function() {
 			assert.equal(getRequestCredential()[accessToken], newToken);
 
 			JQuery.get('/test/1').done((res, status, xhr) => {
-				assert.equal(xhr[tokenHeader], newToken);
+				assert.equal(xhr[tokenHeader], REQUEST_TOKEN_VALUE(newToken));
 			});
 
 			fServer.respond();
@@ -161,7 +161,7 @@ describe('token refresh interceptor -jq version', function() {
 		});
 
 		it('call redirect action when refresh api invoked failed', () => {
-			fServer.respondWith('put', refreshTokenUrl, [401, {}, '']);
+			fServer.respondWith('post', refreshTokenUrl, [401, {}, '']);
 
 			const spy = sandbox.spy();
 			setAuthFailedBehavior(spy);
