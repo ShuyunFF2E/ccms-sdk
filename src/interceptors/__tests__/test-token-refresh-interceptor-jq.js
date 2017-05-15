@@ -122,7 +122,7 @@ describe('token refresh interceptor -jq version', function() {
 
 			fServer.respondWith('post', refreshTokenUrl, request => {
 				console.log(`jq request: ${request}`);
-				if (request.requestHeaders[tokenHeader] === getRequestCredential()[accessToken]) {
+				if (request.requestHeaders[tokenHeader] === REQUEST_TOKEN_VALUE(getRequestCredential()[accessToken])) {
 					request.respond(...spy());
 					return;
 				}

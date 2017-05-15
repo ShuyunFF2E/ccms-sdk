@@ -27,7 +27,7 @@ export default {
 			return;
 		}
 
-		xhr.setRequestHeader(REQUEST_TOKEN_HEADER, credential[accessToken]);
+		xhr.setRequestHeader(REQUEST_TOKEN_HEADER, REQUEST_TOKEN_VALUE(credential[accessToken]));
 		xhr[REQUEST_TOKEN_HEADER] = REQUEST_TOKEN_VALUE(credential[accessToken]);
 		if (credential[refreshToken] && REQUEST_WHITE_LIST.indexOf(config.url) === -1) {
 
@@ -54,7 +54,6 @@ export default {
 		// 所有请求结束了才做refreshToken的操作,避免后端因为token被刷新而导致前一请求失败
 		if (needToRefreshToken && $.active <= 1) {
 			needToRefreshToken = false;
-			xhr[REQUEST_TOKEN_HEADER] = credential[accessToken];
 			// refresh token
 			$.ajax({
 				url: refreshTokenUrl,
