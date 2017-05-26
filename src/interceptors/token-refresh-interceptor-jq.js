@@ -69,7 +69,7 @@ export default {
 				}
 			}).done(response => {
 				// 更新localStorage中token信息
-				setRequestCredential(JSON.parse(response));
+				setRequestCredential(response);
 			}).fail(() => execAuthFailure(xhr));
 		}
 

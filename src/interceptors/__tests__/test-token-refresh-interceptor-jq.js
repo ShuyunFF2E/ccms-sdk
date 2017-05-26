@@ -117,7 +117,7 @@ describe('token refresh interceptor -jq version', function() {
 			setRefreshTokenUrl(refreshTokenUrl);
 
 			spy = sandbox.spy(() => {
-				return [200, {}, JSON.stringify({ ...token, ...{ [accessToken]: newToken } })];
+				return [200, { 'Content-Type': 'application/json' }, JSON.stringify({ ...token, ...{ [accessToken]: newToken } })];
 			});
 
 			fServer.respondWith('post', refreshTokenUrl, request => {
