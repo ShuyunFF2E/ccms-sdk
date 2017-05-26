@@ -47,10 +47,12 @@
     "sinon": "^2.0.0-pre",
     "webpack": "^1.13.0"
   },
+  "peerDependencies": {
+    "jquery": "1.8.3"
+  },
   "dependencies": {
     "angular": "^1.5.3",
     "angular-es-utils": "^2.0.0",
-    "jquery": "^3.1.1",
     "js-cookie": "^2.1.3"
   }
 }

@@ -58,7 +58,7 @@ export default {
 			// refresh token
 			$.ajax({
 				url: refreshTokenUrl,
-				method: 'POST',
+				type: 'POST',
 				data: {
 					refresh_token: credential[refreshToken],
 					grant_type: 'refresh_token'
