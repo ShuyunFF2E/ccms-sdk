@@ -31,7 +31,8 @@ export default {
 		xhr[REQUEST_TOKEN_HEADER] = REQUEST_TOKEN_VALUE(credential[accessToken]);
 		if (credential[refreshToken] && REQUEST_WHITE_LIST.indexOf(config.url) === -1) {
 
-			const expireDateTime = Date.parse(credential[expireTime]);
+			// expireTime type is second
+			const expireDateTime = credential[expireTime] * 1000;
 			const now = Date.now();
 
 			// token失效则直接跳转登录页面

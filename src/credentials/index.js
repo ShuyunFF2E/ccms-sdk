@@ -25,6 +25,7 @@ export function getRequestCredential() {
 
 export function setRequestCredential(credential) {
 	localStorage.setItem(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(credential));
+	Cookie.set(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(credential));
 }
 
 export function removeRequestCredential() {

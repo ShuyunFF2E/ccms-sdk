@@ -57,7 +57,7 @@ describe('token refresh interceptor', () => {
 		const { expireTime, accessToken } = CREDENTIAL_KEY_MAPPER;
 		const token = {
 			[accessToken]: '123456',
-			[expireTime]: '2016-09-13T16:06:30.886+08:00'
+			[expireTime]: '1473753990'
 		};
 
 		setRequestCredential(token);
@@ -80,7 +80,7 @@ describe('token refresh interceptor', () => {
 
 		const token = {
 			[accessToken]: '123456',
-			[expireTime]: '2016-09-13T16:06:30.886+08:00',
+			[expireTime]: '1473753990',
 			[refreshToken]: '12345678890'
 		};
 
@@ -110,7 +110,7 @@ describe('token refresh interceptor', () => {
 		let requestHandler, spy;
 		const token = {
 			[accessToken]: '123456',
-			[expireTime]: '2016-09-13T16:06:30.886+08:00',
+			[expireTime]: '1473753990',
 			[refreshToken]: '12345678890'
 		};
 		const newToken = 'xxxxxxxxxx';
@@ -118,7 +118,7 @@ describe('token refresh interceptor', () => {
 
 		const originalNow = Date.now;
 		beforeEach(() => {
-			Date.now = () => Date.parse(token[expireTime]) - 10 * 60 * 1000;
+			Date.now = () => token[expireTime] * 1000 - 10 * 60 * 1000;
 			setRequestCredential(token);
 			setRefreshTokenUrl(refreshTokenUrl);
 

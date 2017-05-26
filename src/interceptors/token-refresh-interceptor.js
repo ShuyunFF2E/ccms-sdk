@@ -65,7 +65,8 @@ export default {
 		// TODO 兼容处理,如果拿不到refreshToken说明系统还未升级,则不做刷新token逻辑
 		if (credential[refreshToken] && REQUEST_WHITE_LIST.indexOf(config.url) === -1) {
 
-			const expireDateTime = Date.parse(credential[expireTime]);
+			// expireTime type is second
+			const expireDateTime = credential[expireTime] * 1000;
 			const now = Date.now();
 
 			// token失效则直接跳转登录页面
