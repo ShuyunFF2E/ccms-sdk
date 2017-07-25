@@ -17,6 +17,7 @@
   "homepage": "https://github.com/ShuyunFF2E/ccms-sdk",
   "devDependencies": {
     "angular-mocks": "^1.5.3",
+    "axios": "^0.16.2",
     "babel-cli": "^6.7.7",
     "babel-core": "^6.7.4",
     "babel-eslint": "^6.0.4",
@@ -45,6 +46,7 @@
     "karma-phantomjs-launcher": "^1.0.1",
     "karma-webpack": "^1.7.0",
     "mocha": "^2.4.5",
+    "moxios": "^0.4.0",
     "sinon": "^2.0.0-pre",
     "webpack": "^1.13.0"
   },
