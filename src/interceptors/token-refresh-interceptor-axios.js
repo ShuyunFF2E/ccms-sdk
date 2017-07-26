@@ -7,6 +7,7 @@ import qs from 'querystring';
 import {
 	Date,
 	noop,
+	requestCount,
 	CREDENTIAL_KEY_MAPPER,
 	REQUEST_TOKEN_HEADER,
 	REQUEST_TOKEN_VALUE,
@@ -49,11 +50,11 @@ const initInterceptor = http => {
 	// 定义interceptor
 	const interceptors = {
 		requestErr(error) {
-			http.requestCount++;
+			http[requestCount]++;
 			return Promise.reject(error);
 		},
 		request(config) {
-			http.requestCount++;
+			http[requestCount]++;
 			const credential = getRequestCredential();
 
 			const { accessToken, refreshToken, expireTime } = CREDENTIAL_KEY_MAPPER;
@@ -90,13 +91,13 @@ const initInterceptor = http => {
 
 		response(response) {
 
-			http.requestCount--;
+			http[requestCount]--;
 			// 如果请求能正常响应,说明 storage 里的状态是存在的,所以这里不做判断
 			const credential = getRequestCredential();
 			const { accessToken, refreshToken } = CREDENTIAL_KEY_MAPPER;
 
 			// 所有请求结束了才做refreshToken的操作,避免后端因为token被刷新而导致前一请求失败
-			if (needToRefreshToken && http.requestCount <= 0) {
+			if (needToRefreshToken && http[requestCount] <= 0) {
 				needToRefreshToken = false;
 				// refresh token
 				http
@@ -107,12 +108,12 @@ const initInterceptor = http => {
 						}
 					})
 					.then(res => {
-						console.log(JSON.stringify(res.data, null, 4));
+						// console.log(JSON.stringify(res.data, null, 4));
 						// 更新localStorage中token信息
 						setRequestCredential(res.data);
 					})
 					.catch(rejection => {
-						console.error(rejection);
+						// console.error(rejection);
 						execAuthFailure(rejection);
 					});
 			}
@@ -121,7 +122,7 @@ const initInterceptor = http => {
 		},
 
 		responseErr(error) {
-			http.requestCount--;
+			http[requestCount]--;
 			return Promise.reject(error);
 		}
 
@@ -129,7 +130,7 @@ const initInterceptor = http => {
 
 	const { request, response, requestErr, responseErr } = interceptors;
 
-	http.requestCount = 0;
+	http[requestCount] = 0;
 
 	http.interceptors.request.use(request, requestErr);
 	http.interceptors.response.use(response, responseErr);
