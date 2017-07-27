@@ -89,19 +89,12 @@ export default {
 
 		const injector = require('angular-es-utils/injector').default;
 		const $http = injector.get('$http');
-		const $httpParamSerializerJQLike = injector.get('$httpParamSerializerJQLike');
 		// 所有请求结束了才做refreshToken的操作,避免后端因为token被刷新而导致前一请求失败
 		if (needToRefreshToken && $http.pendingRequests.length === 0) {
 
 			needToRefreshToken = false;
 			// refresh token
-			$http
-				.post(refreshTokenUrl, $httpParamSerializerJQLike({ refresh_token: credential[refreshToken], grant_type: 'refresh_token' }), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-						[REQUEST_TOKEN_HEADER]: REQUEST_TOKEN_VALUE(credential[accessToken])
-					}
-				})
+			$http.put(refreshTokenUrl, credential[refreshToken], { headers: { [REQUEST_TOKEN_HEADER]: credential[accessToken] } })
 				.then(response => {
 					// 更新localStorage中token信息
 					setRequestCredential(response.data);

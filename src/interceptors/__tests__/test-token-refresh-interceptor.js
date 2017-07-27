@@ -15,7 +15,7 @@ import { getRequestCredential, setRequestCredential } from '../../credentials';
 
 describe('token refresh interceptor', () => {
 
-	let $http, $httpParamSerializerJQLike, $q, $httpBackend, $rootScope;
+	let $http, $q, $httpBackend, $rootScope;
 	const sandbox = sinon.sandbox.create();
 
 	const queryResponse = { name: 'kuitos' };
@@ -31,9 +31,8 @@ describe('token refresh interceptor', () => {
 			}]);
 
 		angular.mock.module('app');
-		angular.mock.inject((_$http_, _$httpParamSerializerJQLike_, _$q_, _$httpBackend_, _$injector_, _$rootScope_) => {
+		angular.mock.inject((_$http_, _$q_, _$httpBackend_, _$injector_, _$rootScope_) => {
 			$http = _$http_;
-			$httpParamSerializerJQLike = _$httpParamSerializerJQLike_;
 			$q = _$q_;
 			$httpBackend = _$httpBackend_;
 			$rootScope = _$rootScope_;
@@ -125,10 +124,9 @@ describe('token refresh interceptor', () => {
 			spy = sandbox.spy(() => {
 				return [200, { ...token, ...{ [accessToken]: newToken } }];
 			});
-			requestHandler = $httpBackend.whenPOST(refreshTokenUrl,
-				data => data === $httpParamSerializerJQLike({ refresh_token: token[refreshToken], grant_type: 'refresh_token' }),
-				headers => headers[tokenHeader] === REQUEST_TOKEN_VALUE(getRequestCredential()[accessToken])
-			).respond(spy);
+			requestHandler = $httpBackend.whenPUT(refreshTokenUrl, token[refreshToken], headers => {
+				return headers[tokenHeader] === getRequestCredential()[accessToken];
+			}).respond(spy);
 		});
 
 		afterEach(() => {

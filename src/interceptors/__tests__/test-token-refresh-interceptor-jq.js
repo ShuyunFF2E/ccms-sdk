@@ -120,9 +120,8 @@ describe('token refresh interceptor -jq version', function() {
 				return [200, { 'Content-Type': 'application/json' }, JSON.stringify({ ...token, ...{ [accessToken]: newToken } })];
 			});
 
-			fServer.respondWith('post', refreshTokenUrl, request => {
-				console.log(`jq request: ${request}`);
-				if (request.requestHeaders[tokenHeader] === REQUEST_TOKEN_VALUE(getRequestCredential()[accessToken])) {
+			fServer.respondWith('put', refreshTokenUrl, request => {
+				if (request.requestHeaders[tokenHeader] === getRequestCredential()[accessToken]) {
 					request.respond(...spy());
 					return;
 				}
@@ -161,7 +160,7 @@ describe('token refresh interceptor -jq version', function() {
 		});
 
 		it('call redirect action when refresh api invoked failed', () => {
-			fServer.respondWith('post', refreshTokenUrl, [401, {}, '']);
+			fServer.respondWith('put', refreshTokenUrl, [401, {}, '']);
 
 			const spy = sandbox.spy();
 			setAuthFailedBehavior(spy);

@@ -5,13 +5,13 @@ import { getRequestCredential, removeRequestCredential, setRequestCredential } f
 import qs from 'querystring';
 
 import {
+	CREDENTIAL_KEY_MAPPER,
 	Date,
 	noop,
-	requestCount,
-	CREDENTIAL_KEY_MAPPER,
 	REQUEST_TOKEN_HEADER,
 	REQUEST_TOKEN_VALUE,
 	REQUEST_WHITE_LIST,
+	requestCount,
 	USER_SESSION_AVAILABLE_TIME
 } from './metadata';
 
@@ -101,9 +101,8 @@ const initInterceptor = http => {
 				needToRefreshToken = false;
 				// refresh token
 				http
-					.post(refreshTokenUrl, qs.stringify({ 'refresh_token': credential[refreshToken], 'grant_type': 'refresh_token' }), {
+					.put(refreshTokenUrl, qs.stringify({ 'refresh_token': credential[refreshToken] }), {
 						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded',
 							[REQUEST_TOKEN_HEADER]: REQUEST_TOKEN_VALUE(credential[accessToken])
 						}
 					})
