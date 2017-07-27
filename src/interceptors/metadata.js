@@ -9,6 +9,7 @@ const credential = getRequestCredential();
 
 export const Date = window.Date;
 export const noop = () => {};
+export const requestCount = Symbol('REQUEST_COUNT');
 export const REQUEST_TOKEN_HEADER = 'Authorization';
 export const REQUEST_TOKEN_VALUE = value => `Bearer ${value}`;
 // export const USER_SESSION_AVAILABLE_TIME = 30 * 60 * 1000;
