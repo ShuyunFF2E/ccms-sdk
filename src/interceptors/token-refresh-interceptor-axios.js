@@ -72,7 +72,7 @@ const initInterceptor = http => {
 
 
 				// expireTime type is second
-				const expireDateTime = credential[expireTime] * 1000;
+				const expireDateTime = Date.parse(credential[expireTime]);
 				const now = Date.now();
 
 				// token失效则直接跳转登录页面

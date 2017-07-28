@@ -45,7 +45,7 @@ describe('token refresh interceptor -jq version', function() {
 	it('should\'t do anything expect Authorization header setting in old system which has no refreshToken prop in storage.', function() {
 		const token = {
 			[accessToken]: '123456',
-			[expireTime]: '1473753990'
+			[expireTime]: '2016-09-13T16:06:30.886+08:00'
 		};
 
 		setRequestCredential(token);
@@ -72,7 +72,7 @@ describe('token refresh interceptor -jq version', function() {
 	it('should call the fialed behavior when token had expired', () => {
 		const token = {
 			[accessToken]: '123456',
-			[expireTime]: '1473753990',
+			[expireTime]: '2016-09-13T16:06:30.886+08:00',
 			[refreshToken]: '12345678890'
 		};
 
@@ -101,7 +101,7 @@ describe('token refresh interceptor -jq version', function() {
 
 		const token = {
 			[accessToken]: '123456',
-			[expireTime]: '1473753990',
+			[expireTime]: '2016-09-13T16:06:30.886+08:00',
 			[refreshToken]: '12345678890'
 		};
 
@@ -112,7 +112,7 @@ describe('token refresh interceptor -jq version', function() {
 
 		beforeEach(() => {
 
-			Date.now = () => token[expireTime] * 1000 - 10 * 60 * 1000;
+			Date.now = () => Date.parse(token[expireTime]) - 10 * 60 * 1000;
 			setRequestCredential(token);
 			setRefreshTokenUrl(refreshTokenUrl);
 
