@@ -13,12 +13,9 @@ const REQUEST_TOKEN_STORAGE_KEY = 'ccmsRequestCredential';
 export function getRequestCredential() {
 
 	let credential = null;
-	// get credential from cookie when inside an iframe
-	if (window.self !== window.top) {
-		credential = Cookie.get(REQUEST_TOKEN_STORAGE_KEY) || null;
-	} else {
-		credential = localStorage.getItem(REQUEST_TOKEN_STORAGE_KEY) || null;
-	}
+
+	credential = localStorage.getItem(REQUEST_TOKEN_STORAGE_KEY) ||
+		Cookie.get(REQUEST_TOKEN_STORAGE_KEY) || null;
 
 	return JSON.parse(credential);
 }
