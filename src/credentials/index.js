@@ -12,9 +12,7 @@ const REQUEST_TOKEN_STORAGE_KEY = 'ccmsRequestCredential';
 
 export function getRequestCredential() {
 
-	let credential = null;
-
-	credential = localStorage.getItem(REQUEST_TOKEN_STORAGE_KEY) ||
+	const credential = localStorage.getItem(REQUEST_TOKEN_STORAGE_KEY) ||
 		Cookie.get(REQUEST_TOKEN_STORAGE_KEY) || null;
 
 	return JSON.parse(credential);
