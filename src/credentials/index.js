@@ -23,7 +23,8 @@ export function getRequestCredential() {
 	return JSON.parse(credential);
 }
 
-export function setRequestCredential(credential) {
+export function setRequestCredential(credential, client_access_time) {
+	credential['client_access_time'] = client_access_time || Date.now();
 	localStorage.setItem(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(credential));
 	Cookie.set(REQUEST_TOKEN_STORAGE_KEY, JSON.stringify(credential));
 }

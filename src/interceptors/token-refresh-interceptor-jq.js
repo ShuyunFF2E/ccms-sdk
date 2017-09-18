@@ -21,7 +21,7 @@ export default {
 	beforeSend: function(xhr, config) {
 
 		const credential = getRequestCredential();
-		const { accessToken, refreshToken, expireTime } = CREDENTIAL_KEY_MAPPER;
+		const { accessToken, refreshToken, clientAccessTime } = CREDENTIAL_KEY_MAPPER;
 		if (!credential) {
 			execAuthFailure(xhr);
 			return;
@@ -32,14 +32,15 @@ export default {
 		if (credential[refreshToken] && REQUEST_WHITE_LIST.indexOf(config.url) === -1) {
 
 			// expireTime type is second
-			const expireDateTime = credential[expireTime] * 1000;
+			// const expireDateTime = credential[expireTime] * 1000;
+			const clientAccessTimeDate = credential[clientAccessTime] + (USER_SESSION_AVAILABLE_TIME * 2);
 			const now = Date.now();
 
 			// token失效则直接跳转登录页面
 			// token未失效但是可用时长已低于用户会话最短保留时间,则需要刷新token
-			if (USER_SESSION_AVAILABLE_TIME >= expireDateTime - now && expireDateTime - now >= 0) {
+			if (USER_SESSION_AVAILABLE_TIME >= clientAccessTimeDate - now && clientAccessTimeDate - now >= 0) {
 				needToRefreshToken = true;
-			} else if (expireDateTime - now < 0) { // token失效
+			} else if (clientAccessTimeDate - now < 0) { // token失效
 				execAuthFailure(xhr);
 			}
 		}
@@ -69,7 +70,7 @@ export default {
 				}
 			}).done(response => {
 				// 更新localStorage中token信息
-				setRequestCredential(response);
+				setRequestCredential(response, Date.now());
 			}).fail(() => execAuthFailure(xhr));
 		}
 

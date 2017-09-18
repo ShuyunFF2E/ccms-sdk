@@ -18,5 +18,6 @@ export const REQUEST_WHITE_LIST = [];
 export const CREDENTIAL_KEY_MAPPER = {
 	accessToken: 'access_token',
 	refreshToken: 'refresh_token',
-	expireTime: 'expire_time'
+	expireTime: 'expire_time',
+	clientAccessTime: 'client_access_time'
 };

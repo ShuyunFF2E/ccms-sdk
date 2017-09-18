@@ -20,7 +20,7 @@ describe('token refresh interceptor', () => {
 
 	const queryResponse = { name: 'kuitos' };
 	const queryResponse1 = { name: 'kuitosx' };
-	const { expireTime, accessToken, refreshToken } = CREDENTIAL_KEY_MAPPER;
+	const { expireTime, accessToken, refreshToken, clientAccessTime } = CREDENTIAL_KEY_MAPPER;
 
 	beforeEach(() => {
 
@@ -111,15 +111,17 @@ describe('token refresh interceptor', () => {
 		const token = {
 			[accessToken]: '123456',
 			[expireTime]: '1473753990',
-			[refreshToken]: '12345678890'
+			[refreshToken]: '12345678890',
+			[clientAccessTime]: '1473753990'
 		};
 		const newToken = 'xxxxxxxxxx';
 		const refreshTokenUrl = '/test/refreshToken';
 
 		const originalNow = Date.now;
+		const tempTime = token[clientAccessTime];
 		beforeEach(() => {
-			Date.now = () => token[expireTime] * 1000 - 10 * 60 * 1000;
-			setRequestCredential(token);
+			Date.now = () => tempTime * 1000 + 30 * 60 * 1000;
+			setRequestCredential(token, tempTime * 1000);
 			setRefreshTokenUrl(refreshTokenUrl);
 
 			spy = sandbox.spy(() => {

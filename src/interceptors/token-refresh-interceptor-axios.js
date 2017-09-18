@@ -57,7 +57,7 @@ const initInterceptor = http => {
 			http[requestCount]++;
 			const credential = getRequestCredential();
 
-			const { accessToken, refreshToken, expireTime } = CREDENTIAL_KEY_MAPPER;
+			const { accessToken, refreshToken, clientAccessTime } = CREDENTIAL_KEY_MAPPER;
 			// storage 里的状态有可能已经失效
 			if (!credential) {
 				return execAuthFailure({config});
@@ -72,14 +72,15 @@ const initInterceptor = http => {
 
 
 				// expireTime type is second
-				const expireDateTime = credential[expireTime] * 1000;
+				// const expireDateTime = credential[expireTime] * 1000;
+				const clientAccessTimeDate = credential[clientAccessTime] + (USER_SESSION_AVAILABLE_TIME * 2);
 				const now = Date.now();
 
 				// token失效则直接跳转登录页面
 				// token未失效但是可用时长已低于用户会话最短保留时间,则需要刷新token
-				if (USER_SESSION_AVAILABLE_TIME >= expireDateTime - now && expireDateTime - now >= 0) {
+				if (USER_SESSION_AVAILABLE_TIME >= clientAccessTimeDate - now && clientAccessTimeDate - now >= 0) {
 					needToRefreshToken = true;
-				} else if (expireDateTime - now < 0) {
+				} else if (clientAccessTimeDate - now < 0) {
 					// token失效
 					console.log('expired');
 					return execAuthFailure({config});
@@ -110,7 +111,7 @@ const initInterceptor = http => {
 					.then(res => {
 						// console.log(JSON.stringify(res.data, null, 4));
 						// 更新localStorage中token信息
-						setRequestCredential(res.data);
+						setRequestCredential(res.data, Date.now());
 					})
 					.catch(rejection => {
 						// console.error(rejection);
