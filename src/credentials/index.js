@@ -8,7 +8,10 @@ import Cookie from 'js-cookie';
 const localStorage = window.localStorage;
 const JSON = window.JSON;
 
-const REQUEST_TOKEN_STORAGE_KEY = 'ccmsRequestCredential';
+let REQUEST_TOKEN_STORAGE_KEY = 'ccmsRequestCredential';
+export function setTokenKey(key) {
+	REQUEST_TOKEN_STORAGE_KEY = key;
+}
 
 export function getRequestCredential() {
 
