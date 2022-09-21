@@ -41,8 +41,10 @@ export function setAuthFailedBehavior(fn = noop) {
 }
 
 let refreshTokenUrl = '';
-export function setRefreshTokenUrl(url) {
+let refreshTokenParams = {}
+export function setRefreshTokenUrl(url, params = {}) {
 	refreshTokenUrl = url;
+	refreshTokenParams = params
 	REQUEST_WHITE_LIST.push(url);
 }
 
@@ -101,10 +103,8 @@ const initInterceptor = http => {
 				needToRefreshToken = false;
 				// refresh token
 				http
-					.put(refreshTokenUrl, qs.stringify({ 'refresh_token': credential[refreshToken] }), {
-						headers: {
-							[REQUEST_TOKEN_HEADER]: REQUEST_TOKEN_VALUE(credential[accessToken])
-						}
+					.post(refreshTokenUrl, refreshTokenParams), {
+						headers: {'content-type': 'application/json'}
 					})
 					.then(res => {
 						// console.log(JSON.stringify(res.data, null, 4));
